@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0-windows10.0.19041.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <StartupObject>NCMDumpCLI</StartupObject>
+    <ApplicationIcon>NCMDumpCLI.ico</ApplicationIcon>
+    <PlatformTarget>x64</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="NCMDumpCLI.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NCMDumpCore\NCMDumpCore.csproj" />
+  </ItemGroup>
+
+</Project>

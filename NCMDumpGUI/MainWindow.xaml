@@ -1,0 +1,39 @@
+﻿<Window x:Class="NCMDumpGUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NCMDumpGUI"
+        mc:Ignorable="d"
+        Title="NCMDumpGUI" Height="480" Width="720" Icon="/NCMDump.png" MinWidth="720" MinHeight="480" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" AllowDrop="True">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+
+        <ListView x:Name="WorkingList"  Grid.Row="0" SizeChanged="ListView_SizeChanged" AllowDrop="True" Drop="WorkingList_Drop">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="File" DisplayMemberBinding="{Binding FilePath}"/>
+                    <GridViewColumn Header="Status">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding FileStatus}" TextAlignment="Center" HorizontalAlignment="Stretch" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                        <GridViewColumn.HeaderContainerStyle>
+                            <Style TargetType="{x:Type GridViewColumnHeader}">
+                                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                            </Style>
+                        </GridViewColumn.HeaderContainerStyle>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <Button x:Name="StartButton" Content="Convert" HorizontalAlignment="Right" Margin="0,0,40,20" Click="StartButton_Click" Grid.Row="1" FontSize="18" Background="#FF005FB8" Foreground="White" VerticalAlignment="Bottom" Height="35" Width="120"/>
+        <Button x:Name="SelectButton" Content="Select" HorizontalAlignment="Left" Margin="40,0,0,20" Click="SelectButton_Click" Grid.Row="1" FontSize="18" Background="#FFFBFBFB" Foreground="Black" VerticalAlignment="Bottom" Height="35" Width="120"/>
+    </Grid>
+
+
+</Window>
