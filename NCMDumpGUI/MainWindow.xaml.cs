@@ -1,22 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.Win32;
+using NCMDumpCore;
 using System.Collections.ObjectModel;
-using System.Data;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Microsoft.Win32;
-using System.Linq;
-using NCMDumpCore;
 namespace NCMDumpGUI
 {
 
@@ -58,7 +45,7 @@ namespace NCMDumpGUI
             {
                 foreach (string file in files)
                 {
-                    if (file.EndsWith(@".ncm") && !NCMCollection.Any(x=>x.FilePath==file))
+                    if (file.EndsWith(@".ncm") && !NCMCollection.Any(x => x.FilePath == file))
                         NCMCollection.Add(new NCMProcessStatus(file, "Await"));
                 }
             }
@@ -84,13 +71,13 @@ namespace NCMDumpGUI
 
         private void SelectButton_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog ofp =     new OpenFileDialog();
+            OpenFileDialog ofp = new OpenFileDialog();
             ofp.Multiselect = true;
             ofp.Filter = "NCM File(*.ncm)|*.ncm";
 
             if (ofp.ShowDialog() == true)
             {
-                foreach(string file in ofp.FileNames)
+                foreach (string file in ofp.FileNames)
                 {
                     if (file.EndsWith(@".ncm") && !NCMCollection.Any(x => x.FilePath == file))
                         NCMCollection.Add(new NCMProcessStatus(file, "Await"));

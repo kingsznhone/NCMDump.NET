@@ -1,10 +1,7 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Encodings.Web;
 using System.Text.Json;
-using System.Text.Unicode;
 using TagLib;
 
 namespace NCMDumpCore
@@ -86,8 +83,9 @@ namespace NCMDumpCore
                 var decrypter = aes.CreateDecryptor();
                 RawMetaData = decrypter.TransformFinalBlock(RawMetaData, 0, RawMetaData.Length);
                 var MetaJsonString = Encoding.UTF8.GetString(RawMetaData).Replace("music:", "");
+                MetaInfo metainfo = new MetaInfo();
 
-                MetaInfo metainfo = JsonSerializer.Deserialize<MetaInfo>(MetaJsonString);
+                metainfo = JsonSerializer.Deserialize<MetaInfo>(MetaJsonString);
 
                 //// Inverse to json and verify
 
@@ -127,25 +125,9 @@ namespace NCMDumpCore
 
         private void AddTag(string fileName, byte[] ImgData, MetaInfo metainfo)
         {
-            var tagfile = TagLib.File.Create(fileName);
 
-            //Use Embedded Picture
-            if (ImgData.Length != 0)
-            {
-                var PicEmbedded = new Picture(new ByteVector(ImgData));
-                tagfile.Tag.Pictures = new Picture[] { PicEmbedded };
-            }
-            //Use Internet Picture
-            else if (metainfo.albumPic != "")
-            {
-                byte[] NetImgData;
-                NetImgData = FetchUrl(new Uri(metainfo.albumPic));
-                if (NetImgData.Length != 0)
-                {
-                    var PicFromNet = new Picture(new ByteVector(NetImgData));
-                    tagfile.Tag.Pictures = new Picture[] { PicFromNet };
-                }
-            }
+            var tagfile = TagLib.File.Create(fileName);
+            AddCover(tagfile);
 
             //Add more infomation
             tagfile.Tag.Title = metainfo.musicName;
@@ -153,6 +135,29 @@ namespace NCMDumpCore
             tagfile.Tag.Album = metainfo.album;
             tagfile.Tag.Subtitle = String.Join(@";", metainfo.alias);
             tagfile.Save();
+
+
+            void AddCover(TagLib.File tagfile)
+            {
+                //Use Embedded Picture
+                if (ImgData.Length != 0)
+                {
+                    var PicEmbedded = new Picture(new ByteVector(ImgData));
+                    tagfile.Tag.Pictures = new Picture[] { PicEmbedded };
+                }
+                //Use Internet Picture
+                else if (metainfo.albumPic != "")
+                {
+                    byte[] NetImgData;
+                    NetImgData = FetchUrl(new Uri(metainfo.albumPic));
+                    if (NetImgData.Length != 0)
+                    {
+                        var PicFromNet = new Picture(new ByteVector(NetImgData));
+                        tagfile.Tag.Pictures = new Picture[] { PicFromNet };
+                    }
+                }
+                tagfile.Save();
+            }
         }
 
         private byte[] FetchUrl(Uri uri)
@@ -188,8 +193,6 @@ namespace NCMDumpCore
                 Console.WriteLine("Message :{0} ", e.Message);
                 return null;
             }
-
-
         }
 
         private uint ReadUint32(MemoryStream ms)
@@ -201,7 +204,7 @@ namespace NCMDumpCore
 
         public async Task<bool> ConvertAsync(string path)
         {
-            return Convert(path);    
+            return Convert(path);
         }
 
         public bool Convert(string path)
@@ -251,6 +254,8 @@ namespace NCMDumpCore
 
             //Flush Audio Data to disk drive
             string OutputPath = path.Substring(0, path.LastIndexOf("."));
+
+            if (format is null or "") format = "mp3";
             System.IO.File.WriteAllBytes($"{OutputPath}.{format}", AudioData);
 
             //Add tag and cover
