@@ -1,11 +1,20 @@
 # NCMDump.NET
 Decipher .ncm file to mp3 || flac
 
+# Changelog
+
+### v1.1
+
+Drag directory on executable support.
+
+Bug fix
+
+
 # Usage
 
 ### CLI
 
-Drag .ncm file on .exe
+Drag .ncm file or directory on .exe
 
 ### GUI
 ~~omission~~
