@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NCMDumpGUI"
         mc:Ignorable="d"
-        Title="NCMDumpGUI" Height="480" Width="720" Icon="/NCMDump.png" MinWidth="720" MinHeight="480" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" AllowDrop="True">
+        Title="NCMDumpGUI" Height="480" Width="720" Icon="/NCMDump.png" MinWidth="720" MinHeight="480" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" AllowDrop="True" Closed="Window_Closed">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="5*"/>

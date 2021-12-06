@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using NCMDumpCore;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -84,6 +85,7 @@ namespace NCMDumpGUI
                 if (await core.ConvertAsync(NCMCollection[i].FilePath))
                 {
                     NCMCollection[i].FileStatus = "Success";
+                    this.UpdateLayout();
                 }
                 else
                 {
@@ -125,6 +127,11 @@ namespace NCMDumpGUI
         private void ClearButton_Click(object sender, RoutedEventArgs e)
         {
             NCMCollection.Clear();
+        }
+
+        private void Window_Closed(object sender, System.EventArgs e)
+        {
+            Environment.Exit(0);
         }
     }
 }
