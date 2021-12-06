@@ -1,9 +1,12 @@
 ﻿using Microsoft.Win32;
 using NCMDumpCore;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
+
 namespace NCMDumpGUI
 {
 
@@ -27,7 +30,7 @@ namespace NCMDumpGUI
 
         private void ListView_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            ListView listView = sender as ListView;
+            System.Windows.Controls.ListView listView = sender as System.Windows.Controls.ListView;
             GridView gView = listView.View as GridView;
 
             var workingWidth = listView.ActualWidth - SystemParameters.VerticalScrollBarWidth; // take into account vertical scrollbar
@@ -38,16 +41,37 @@ namespace NCMDumpGUI
             gView.Columns[1].Width = workingWidth * col2;
         }
 
-        private void WorkingList_Drop(object sender, DragEventArgs e)
+        private void WorkingList_Drop(object sender, System.Windows.DragEventArgs e)
         {
-            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
-            if (files != null && files.Length != 0)
+            string[] args = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
+            if (args != null && args.Length != 0)
             {
-                foreach (string file in files)
+                foreach (string _path in args)
                 {
-                    if (file.EndsWith(@".ncm") && !NCMCollection.Any(x => x.FilePath == file))
-                        NCMCollection.Add(new NCMProcessStatus(file, "Await"));
+                    if (new DirectoryInfo(_path).Exists)
+                    {
+                        WalkThrough(new DirectoryInfo(_path));
+                    }
+                    else if (new FileInfo(_path).Exists)
+                    {
+                        if (_path.EndsWith(@".ncm") && !NCMCollection.Any(x => x.FilePath == _path))
+                            NCMCollection.Add(new NCMProcessStatus(_path, "Await"));
+                    }                 
                 }
+            }
+
+            
+        }
+        private void WalkThrough(DirectoryInfo dir)
+        {
+            foreach (DirectoryInfo d in dir.GetDirectories())
+            {
+                WalkThrough(d);
+            }
+            foreach (FileInfo f in dir.EnumerateFiles())
+            {
+                if (f.FullName.EndsWith(@".ncm") && !NCMCollection.Any(x => x.FilePath == f.FullName))
+                    NCMCollection.Add(new NCMProcessStatus(f.FullName, "Await"));
             }
         }
 
@@ -69,9 +93,9 @@ namespace NCMDumpGUI
             }
         }
 
-        private void SelectButton_Click(object sender, RoutedEventArgs e)
+        private void SelectFileButton_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog ofp = new OpenFileDialog();
+            Microsoft.Win32.OpenFileDialog ofp = new Microsoft.Win32.OpenFileDialog();
             ofp.Multiselect = true;
             ofp.Filter = "NCM File(*.ncm)|*.ncm";
 
@@ -83,6 +107,24 @@ namespace NCMDumpGUI
                         NCMCollection.Add(new NCMProcessStatus(file, "Await"));
                 }
             }
+        }
+
+        private void SelectFolderButton_Click(object sender, RoutedEventArgs e)
+        {
+            using (var dialog = new FolderBrowserDialog())
+            {
+                DialogResult result = dialog.ShowDialog();
+                if (result == System.Windows.Forms.DialogResult.OK)
+                {
+                    string folderPath = dialog.SelectedPath;
+                    WalkThrough(new DirectoryInfo( folderPath));
+                }
+            }
+        }
+
+        private void ClearButton_Click(object sender, RoutedEventArgs e)
+        {
+            NCMCollection.Clear();
         }
     }
 }

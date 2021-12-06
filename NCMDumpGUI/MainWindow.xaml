@@ -31,8 +31,10 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button x:Name="StartButton" Content="Convert" HorizontalAlignment="Right" Margin="0,0,40,20" Click="StartButton_Click" Grid.Row="1" FontSize="18" Background="#FF005FB8" Foreground="White" VerticalAlignment="Bottom" Height="35" Width="120"/>
-        <Button x:Name="SelectButton" Content="Select" HorizontalAlignment="Left" Margin="40,0,0,20" Click="SelectButton_Click" Grid.Row="1" FontSize="18" Background="#FFFBFBFB" Foreground="Black" VerticalAlignment="Bottom" Height="35" Width="120"/>
+        <Button x:Name="StartButton" Content="Convert" HorizontalAlignment="Right" Margin="0,0,20,20" Click="StartButton_Click" Grid.Row="1" FontSize="18" Background="#FF005FB8" Foreground="White" VerticalAlignment="Bottom" Height="35" Width="120"/>
+        <Button x:Name="SelectFileButton" Content="Select File" HorizontalAlignment="Right" Click="SelectFileButton_Click" Grid.Row="1" FontSize="18" Background="#FFFBFBFB" Foreground="Black" VerticalAlignment="Bottom" Height="35" Width="120" Margin="0,0,160,20"/>
+        <Button x:Name="SelectFolderButton" Content="Select Folder" HorizontalAlignment="Right" Click="SelectFolderButton_Click" Grid.Row="1" FontSize="18" Background="#FFFBFBFB" Foreground="Black" VerticalAlignment="Bottom" Height="35" Width="120" Margin="0,0,300,20"/>
+        <Button x:Name="ClearButton" Content="Clear" HorizontalAlignment="Left" Click="ClearButton_Click" Grid.Row="1" FontSize="18" Background="#FFFBFBFB" Foreground="Black" VerticalAlignment="Top" Height="35" Width="120" Margin="20,20,0,0"/>
     </Grid>
 
 

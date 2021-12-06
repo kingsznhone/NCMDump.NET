@@ -9,7 +9,7 @@
     <ApplicationIcon>NCMDumpCLI.ico</ApplicationIcon>
     <PlatformTarget>x64</PlatformTarget>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-	  <Version>1.1.2</Version>
+	<Version>1.1.2</Version>
   </PropertyGroup>
 
   <ItemGroup>

@@ -3,6 +3,12 @@ Decipher .ncm file to mp3 || flac
 
 # Changelog
 
+### v1.2
+
+Bug fix.
+
+Drag directory || Select folder on GUI support.
+
 ### v1.1
 
 Drag directory on executable support.

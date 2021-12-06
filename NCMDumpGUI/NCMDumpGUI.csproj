@@ -6,6 +6,8 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>NCMDumpCLI.ico</ApplicationIcon>
+    <UseWindowsForms>True</UseWindowsForms>
+	<Version>1.1.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
