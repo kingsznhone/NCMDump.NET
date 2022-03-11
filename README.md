@@ -8,6 +8,8 @@ Highly Optimized Corelib.
 
 Keep all ID3 tags and cover image. Very nice.
 
+<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Result.png"/>
+
 ## Changelog
 
 ### v1.3
