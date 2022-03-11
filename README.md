@@ -56,7 +56,7 @@ File Path to a NCM file.
 
 #### Return
 
-```bool``` Is convert success
+```bool``` True if convert success
 
 <br/>
 
@@ -72,7 +72,7 @@ File Path to a NCM file.
 
 #### Return
 
-```bool``` Is convert success
+```bool``` True if convert success
 
 ## Refrence
 
