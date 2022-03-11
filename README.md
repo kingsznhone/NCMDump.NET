@@ -44,33 +44,25 @@ Don't ask, Just use.
 
 ## API
 
-### NCMDump.Convert(String) Method
+### public bool Convert(string path) Method
 
 Convert NCM file into MP3/FLAC format in synchronous.
 
-```
-public bool Convert(string path)
-```
 #### Parameters
 
 ```path``` String
 
 File Path to a NCM file.
 
-
-### NCMDump.ConvertAsync(String) Method
+### public async Task\<bool\> ConvertAsync(string path) Method
 
 Convert NCM file into MP3/FLAC format in asynchronous.
 
-```
-public async Task<bool> ConvertAsync(string path)
-```
 #### Parameters
 
 ```path``` String
 
 File Path to a NCM file.
-
 
 ## Refrence
 
