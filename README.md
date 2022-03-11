@@ -44,7 +44,7 @@ Don't ask, Just use.
 
 ## API
 
-### public bool Convert(string path) Method
+### public bool Convert(string path)
 
 Convert NCM file into MP3/FLAC format in synchronous.
 
@@ -54,7 +54,13 @@ Convert NCM file into MP3/FLAC format in synchronous.
 
 File Path to a NCM file.
 
-### public async Task\<bool\> ConvertAsync(string path) Method
+#### Return
+
+```bool``` Is convert success
+
+<br/>
+
+### public async Task\<bool\> ConvertAsync(string path)
 
 Convert NCM file into MP3/FLAC format in asynchronous.
 
@@ -63,6 +69,10 @@ Convert NCM file into MP3/FLAC format in asynchronous.
 ```path``` String
 
 File Path to a NCM file.
+
+#### Return
+
+```bool``` Is convert success
 
 ## Refrence
 
