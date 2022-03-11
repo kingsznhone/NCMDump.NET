@@ -1,7 +1,14 @@
 # NCMDump.NET
+
 Decipher .ncm file to mp3 || flac
 
-# Changelog
+## Changelog
+
+### v1.3
+
+Bug fix.
+
+Async optimization.
 
 ### v1.2
 
@@ -15,21 +22,21 @@ Drag directory on executable support.
 
 Bug fix
 
-
-# Usage
+## Usage
 
 ### CLI
 
 Drag .ncm file or directory on .exe
 
 ### GUI
+
 ~~omission~~
 
+## System Requirement
 
-# System Requirement
-
-### OS : Windows 10 10.0.19041.0 with .NET6
+### OS : Windows 10 10.0.19041.0 with .NET6 Runtime
 
 
-# Refrence
-https://github.com/anonymous5l/ncmdump
+## Refrence
+
+<https://github.com/anonymous5l/ncmdump>

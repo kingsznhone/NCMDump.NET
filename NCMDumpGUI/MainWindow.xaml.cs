@@ -4,6 +4,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
@@ -82,7 +83,7 @@ namespace NCMDumpGUI
             {
                 if (NCMCollection[i].FileStatus == "Success") continue;
 
-                if (await core.ConvertAsync(NCMCollection[i].FilePath))
+                if (await Task.Run(()=>core.ConvertAsync(NCMCollection[i].FilePath)))
                 {
                     NCMCollection[i].FileStatus = "Success";
                     this.UpdateLayout();

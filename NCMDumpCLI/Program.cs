@@ -7,8 +7,6 @@ public class NCMDumpCLI
     {
         NCMDump Core = new();
 
-
-
         if (args.Length == 0)
         {
             Console.WriteLine("Drag [*.ncm] file on exe to start");
@@ -42,7 +40,7 @@ public class NCMDumpCLI
         Console.Write("Press Any Key to Exit...");
         Console.ReadLine();
 
-        void WalkThrough(DirectoryInfo dir)
+        async void WalkThrough(DirectoryInfo dir)
         {
             Console.WriteLine("DIR: " + dir.FullName);
             foreach (DirectoryInfo d in dir.GetDirectories())
@@ -52,7 +50,7 @@ public class NCMDumpCLI
             foreach (FileInfo f in dir.EnumerateFiles())
             {
                 Console.WriteLine("Converting : " + f.FullName);
-                if (Core.Convert(f.FullName)) Console.WriteLine("...OK");
+                if (await Core.ConvertAsync(f.FullName)) Console.WriteLine("...OK");
                 else Console.WriteLine("...Fail");
                 Console.WriteLine();
             }

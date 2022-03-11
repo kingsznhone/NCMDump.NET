@@ -7,7 +7,7 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>NCMDumpCLI.ico</ApplicationIcon>
     <UseWindowsForms>True</UseWindowsForms>
-	<Version>1.1.2</Version>
+	<Version>1.3.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

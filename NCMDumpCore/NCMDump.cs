@@ -202,12 +202,12 @@ namespace NCMDumpCore
             return BitConverter.ToUInt32(buffer);
         }
 
-        public async Task<bool> ConvertAsync(string path)
+        public bool Convert(string path)
         {
-            return Convert(path);
+            return Task.Run(()=>ConvertAsync(path)).Result;
         }
 
-        public bool Convert(string path)
+        public async Task<bool> ConvertAsync(string path)
         {
             if (!System.IO.File.Exists(path))
             {
@@ -216,7 +216,7 @@ namespace NCMDumpCore
             }
 
             //Read all bytes to ram.
-            var ms = new MemoryStream(System.IO.File.ReadAllBytes(path));
+            var ms = new MemoryStream(await System.IO.File.ReadAllBytesAsync(path));
 
             //Verify Header
             if (!ReadHeader(ref ms))
