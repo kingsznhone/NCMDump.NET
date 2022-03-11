@@ -2,6 +2,12 @@
 
 Decipher .ncm file to mp3 || flac
 
+## Feature
+
+Highly Optimized Corelib.
+
+Keep all ID3 tags and cover image. Very nice.
+
 ## Changelog
 
 ### v1.3
@@ -26,15 +32,46 @@ Bug fix
 
 ### CLI
 
-Drag .ncm file or directory on .exe
+Drag .ncm file or directory on exe
 
 ### GUI
 
-~~omission~~
+Don't ask, Just use.
 
 ## System Requirement
 
 ### OS : Windows 10 10.0.19041.0 with .NET6 Runtime
+
+## API
+
+### NCMDump.Convert(String) Method
+
+Convert NCM file into MP3/FLAC format in synchronous.
+
+```
+public bool Convert(string path)
+```
+
+#### Parameters
+
+```path``` String
+
+File Path to a NCM file.
+
+
+### NCMDump.ConvertAsync(String) Method
+
+Convert NCM file into MP3/FLAC format in asynchronous.
+
+```
+public async Task<bool> ConvertAsync(string path)
+```
+
+#### Parameters
+
+```path``` String
+
+File Path to a NCM file.
 
 
 ## Refrence
