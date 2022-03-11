@@ -51,7 +51,6 @@ Convert NCM file into MP3/FLAC format in synchronous.
 ```
 public bool Convert(string path)
 ```
-
 #### Parameters
 
 ```path``` String
@@ -66,7 +65,6 @@ Convert NCM file into MP3/FLAC format in asynchronous.
 ```
 public async Task<bool> ConvertAsync(string path)
 ```
-
 #### Parameters
 
 ```path``` String
