@@ -58,11 +58,11 @@ namespace NCMDumpGUI
                     {
                         if (_path.EndsWith(@".ncm") && !NCMCollection.Any(x => x.FilePath == _path))
                             NCMCollection.Add(new NCMProcessStatus(_path, "Await"));
-                    }                 
+                    }
                 }
             }
 
-            
+
         }
         private void WalkThrough(DirectoryInfo dir)
         {
@@ -83,7 +83,7 @@ namespace NCMDumpGUI
             {
                 if (NCMCollection[i].FileStatus == "Success") continue;
 
-                if (await Task.Run(()=>core.ConvertAsync(NCMCollection[i].FilePath)))
+                if (await Task.Run(() => core.ConvertAsync(NCMCollection[i].FilePath)))
                 {
                     NCMCollection[i].FileStatus = "Success";
                     this.UpdateLayout();
@@ -91,6 +91,7 @@ namespace NCMDumpGUI
                 else
                 {
                     NCMCollection[i].FileStatus = "Fail";
+                    this.UpdateLayout();
                 }
 
             }
@@ -120,7 +121,7 @@ namespace NCMDumpGUI
                 if (result == System.Windows.Forms.DialogResult.OK)
                 {
                     string folderPath = dialog.SelectedPath;
-                    WalkThrough(new DirectoryInfo( folderPath));
+                    WalkThrough(new DirectoryInfo(folderPath));
                 }
             }
         }
