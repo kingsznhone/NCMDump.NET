@@ -100,15 +100,15 @@ namespace NCMDumpCore
             }
         }
 
-        private byte[] ReadAudioData(ref MemoryStream ms, byte[] key_box)
+        private byte[] ReadAudioData(ref MemoryStream Source, byte[] key_box)
         {
             byte[] chunk = new byte[0x8000];
             int j;
-            using (MemoryStream msData = new MemoryStream())
+            using (MemoryStream msDecrypted = new MemoryStream())
             {
                 while (true)
                 {
-                    if (ms.Read(chunk, 0, chunk.Length) <= 0)
+                    if (Source.Read(chunk, 0, chunk.Length) <= 0)
                     {
                         break;
                     }
@@ -117,13 +117,13 @@ namespace NCMDumpCore
                         j = (i + 1) & 0xff;
                         chunk[i] ^= key_box[(key_box[j] + key_box[(key_box[j] + j) & 0xff]) & 0xff];
                     }
-                    msData.Write(chunk, 0, chunk.Length);
+                    msDecrypted.Write(chunk, 0, chunk.Length);
                 }
-                return msData.ToArray();
+                return msDecrypted.ToArray();
             }
         }
 
-        private void AddTag(string fileName, byte[] ImgData, MetaInfo metainfo)
+        private void AddTag(string fileName, byte[]? ImgData, MetaInfo metainfo)
         {
 
             var tagfile = TagLib.File.Create(fileName);
@@ -140,7 +140,7 @@ namespace NCMDumpCore
             void AddCover(TagLib.File tagfile)
             {
                 //Use Embedded Picture
-                if (ImgData.Length != 0)
+                if (ImgData != null)
                 {
                     var PicEmbedded = new Picture(new ByteVector(ImgData));
                     tagfile.Tag.Pictures = new Picture[] { PicEmbedded };
@@ -148,9 +148,8 @@ namespace NCMDumpCore
                 //Use Internet Picture
                 else if (metainfo.albumPic != "")
                 {
-                    byte[] NetImgData;
-                    NetImgData = FetchUrl(new Uri(metainfo.albumPic));
-                    if (NetImgData.Length != 0)
+                    byte[]? NetImgData = FetchUrl(new Uri(metainfo.albumPic));
+                    if (NetImgData != null)
                     {
                         var PicFromNet = new Picture(new ByteVector(NetImgData));
                         tagfile.Tag.Pictures = new Picture[] { PicFromNet };
@@ -160,7 +159,7 @@ namespace NCMDumpCore
             }
         }
 
-        private byte[] FetchUrl(Uri uri)
+        private byte[]? FetchUrl(Uri uri)
         {
             HttpClient client = new HttpClient();
             try
@@ -204,7 +203,7 @@ namespace NCMDumpCore
 
         public bool Convert(string path)
         {
-            return Task.Run(()=>ConvertAsync(path)).Result;
+            return Task.Run(() => ConvertAsync(path)).Result;
         }
 
         public async Task<bool> ConvertAsync(string path)
@@ -244,10 +243,17 @@ namespace NCMDumpCore
 
             // read image length
             var ImageLength = ReadUint32(ms);
-
-            // read image data
-            byte[] ImageData = new byte[ImageLength];
-            ms.Read(ImageData, 0, ImageData.Length);
+            byte[]? ImageData;
+            if (ImageLength != 0)
+            {
+                // read image data
+                ImageData = new byte[ImageLength];
+                ms.Read(ImageData, 0, ImageData.Length);
+            }
+            else
+            {
+                ImageData = null;
+            }
 
             // Read Audio Data
             byte[] AudioData = ReadAudioData(ref ms, KeyBox);
