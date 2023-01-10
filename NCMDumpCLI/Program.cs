@@ -57,7 +57,6 @@ public class NCMDumpCLI
 
             Console.WriteLine();
         }
-
     }
 }
 

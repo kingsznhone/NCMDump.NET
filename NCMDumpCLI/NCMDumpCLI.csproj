@@ -6,14 +6,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <StartupObject>NCMDumpCLI</StartupObject>
-    <ApplicationIcon>NCMDumpCLI.ico</ApplicationIcon>
+    <ApplicationIcon>NCMDump.ico</ApplicationIcon>
     <PlatformTarget>x64</PlatformTarget>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-	<Version>1.3.0</Version>
+	<Version>1.4.0</Version>
+	<Platforms>x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="NCMDumpCLI.ico" />
+    <Content Include="NCMDump.ico" />
   </ItemGroup>
 
   <ItemGroup>

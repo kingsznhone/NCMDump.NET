@@ -11,19 +11,21 @@ namespace NCMDumpCore
         readonly byte[] coreKey = { 0x68, 0x7A, 0x48, 0x52, 0x41, 0x6D, 0x73, 0x6F, 0x35, 0x6B, 0x49, 0x6E, 0x62, 0x61, 0x78, 0x57 };
         readonly byte[] metaKey = { 0x23, 0x31, 0x34, 0x6C, 0x6A, 0x6B, 0x5F, 0x21, 0x5C, 0x5D, 0x26, 0x30, 0x55, 0x3C, 0x27, 0x28 };
 
+        public NCMDump() 
+        {
+        }
         private bool ReadHeader(ref MemoryStream ms)
         {
             byte[] header = new byte[8];
-            // Header Should be "CTENFDAM"
             ms.Read(header, 0, header.Length);
-            return Encoding.ASCII.GetString(header) == "CTENFDAM";
+            // Header Should be "CTENFDAM"
+            return Enumerable.SequenceEqual(header, new byte[] { 067, 084, 069, 078, 070, 068, 065, 077 });
         }
 
         private byte[] MakeKeybox(ref MemoryStream ms)
         {
             // read keybox length
-            uint KeyboxLength = ReadUint32(ms);
-            //Console.WriteLine($"AES Key Length: {KeyboxLength}");
+            uint KeyboxLength = ReadUint32(ref ms);
 
             // read raw keybox data
             var buffer = new byte[KeyboxLength];
@@ -66,7 +68,7 @@ namespace NCMDumpCore
         private MetaInfo ReadMeta(ref MemoryStream ms)
         {
             // read meta length
-            var MetaLength = ReadUint32(ms);
+            var MetaLength = ReadUint32(ref ms);
             var RawMetaData = new byte[MetaLength];
             ms.Read(RawMetaData, 0, RawMetaData.Length);
             for (int i = 0; i < RawMetaData.Length; i++)
@@ -194,7 +196,7 @@ namespace NCMDumpCore
             }
         }
 
-        private uint ReadUint32(MemoryStream ms)
+        private uint ReadUint32(ref MemoryStream ms)
         {
             byte[] buffer = new byte[4];
             ms.Read(buffer, 0, buffer.Length);
@@ -242,7 +244,7 @@ namespace NCMDumpCore
             ms.Seek(5, SeekOrigin.Current);
 
             // read image length
-            var ImageLength = ReadUint32(ms);
+            var ImageLength = ReadUint32(ref ms);
             byte[]? ImageData;
             if (ImageLength != 0)
             {

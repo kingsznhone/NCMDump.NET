@@ -4,30 +4,68 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using System.Windows.Interop;
+using HandyControl;
+using HandyControl.Controls;
 
 namespace NCMDumpGUI
 {
+    public enum ACCENTSTATE
+    {
+        ACCENT_DISABLED = 0,
+        ACCENT_ENABLE_GRADIENT = 1,
+        ACCENT_ENABLE_TRANSPARENTGRADIENT = 2,
+        ACCENT_ENABLE_BLURBEHIND = 3,
+        ACCENT_ENABLE_ACRYLICBLURBEHIND = 4,
+        ACCENT_INVALID_STATE = 5
+    }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct ACCENTPOLICY
+    {
+        public ACCENTSTATE AccentState;
+        public int AccentFlags;
+        public uint GradientColor;
+        public int AnimationId;
+    }
+    public enum WINDOWCOMPOSITIONATTRIB
+    {
+        WCA_ACCENT_POLICY = 19
+    }
+    [StructLayout(LayoutKind.Sequential)]
+    public struct WINCOMPATTRDATA
+    {
+        public WINDOWCOMPOSITIONATTRIB Attribute;
+        public IntPtr Data;
+        public int DataSize;
+    }
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : BlurWindow
     {
-        NCMDump core = new NCMDump();
+        NCMDump Core = new NCMDump();
+
+        [DllImport("user32.dll")]
+        public static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WINCOMPATTRDATA data);
 
         public ObservableCollection<NCMProcessStatus> NCMCollection { get; set; }
          = new ObservableCollection<NCMProcessStatus>();
 
+        IntPtr Hwnd;
+
         public MainWindow()
-        {
+        {       
             InitializeComponent();
-            //WorkingList.Items.Add(new NCMProcessStatus ( "AAAAA", "Done"));
             WorkingList.ItemsSource = NCMCollection;
+            App.Current.Resources["BlurGradientValue"] = 0xaaffffff;
         }
 
         private void ListView_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -61,9 +99,8 @@ namespace NCMDumpGUI
                     }
                 }
             }
-
-
         }
+
         private void WalkThrough(DirectoryInfo dir)
         {
             foreach (DirectoryInfo d in dir.GetDirectories())
@@ -79,22 +116,22 @@ namespace NCMDumpGUI
 
         private async void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            for (int i = 0; i < NCMCollection.Count; i++)
+            Parallel.For(0, NCMCollection.Count, async (i, state) =>
             {
-                if (NCMCollection[i].FileStatus == "Success") continue;
-
-                if (await Task.Run(() => core.ConvertAsync(NCMCollection[i].FilePath)))
+                if (NCMCollection[i].FileStatus != "Success")
                 {
-                    NCMCollection[i].FileStatus = "Success";
-                    this.UpdateLayout();
-                }
-                else
-                {
-                    NCMCollection[i].FileStatus = "Fail";
-                    this.UpdateLayout();
-                }
-
-            }
+                    if (await Task.Run(() => Core.ConvertAsync(NCMCollection[i].FilePath)))
+                    {
+                        NCMCollection[i].FileStatus = "Success";
+                        Dispatcher.Invoke(()=> this.UpdateLayout());
+                    }
+                    else
+                    {
+                        NCMCollection[i].FileStatus = "Fail";
+                        Dispatcher.Invoke(() => this.UpdateLayout());
+                    }
+                } 
+            });
         }
 
         private void SelectFileButton_Click(object sender, RoutedEventArgs e)
@@ -135,5 +172,6 @@ namespace NCMDumpGUI
         {
             Environment.Exit(0);
         }
+
     }
 }
