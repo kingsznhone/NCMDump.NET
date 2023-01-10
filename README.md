@@ -6,11 +6,17 @@ Decipher .ncm file to mp3 || flac
 
 Highly Optimized Corelib.
 
-Keep all ID3 tags and cover image.
+Keep ID3 tags and cover image.
 
 <img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Result.png"/>
 
 ## Changelog
+
+### v1.4
+
+UI adjustment.
+
+Performance Improvement.
 
 ### v1.3
 

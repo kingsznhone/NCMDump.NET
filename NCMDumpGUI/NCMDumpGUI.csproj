@@ -7,8 +7,9 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>NCMDumpCLI.ico</ApplicationIcon>
     <UseWindowsForms>True</UseWindowsForms>
-	<Version>1.3.0</Version>
+	<Version>1.4.0</Version>
 	<PlatformTarget>x64</PlatformTarget>
+	<Platforms>x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +26,14 @@
 
   <ItemGroup>
     <Resource Include="ncmdump.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HandyControl" Version="3.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
 
 </Project>
