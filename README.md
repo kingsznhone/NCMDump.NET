@@ -12,11 +12,21 @@ Keep ID3 tags and cover image.
 
 ## Changelog
 
+### v1.5
+
+Upgrade to .Net 7 Runtime  [Download Link](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-7.0.4-windows-x64-installer ".NET 7.0 Desktop Runtime (v7.0.4) - Windows x64 Installer")
+
+Add check box: Delete .ncm file when done 
+
+<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo2.png"/>
+
 ### v1.4
 
 UI adjustment.
 
 Performance Improvement.
+
+<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo1.png"/>
 
 ### v1.3
 
@@ -48,7 +58,7 @@ Don't ask, Just use.
 
 ## System Requirement
 
-### OS : Windows 10 10.0.19041.0 with .NET6 Runtime
+### OS : Windows 10 10.0.19041.0 with .NET7 Desktop Runtime
 
 ## API
 

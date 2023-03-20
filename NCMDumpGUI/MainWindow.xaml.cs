@@ -1,18 +1,14 @@
-﻿using Microsoft.Win32;
+﻿using HandyControl.Controls;
 using NCMDumpCore;
 using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
-using System.Windows.Interop;
-using HandyControl;
-using HandyControl.Controls;
 
 namespace NCMDumpGUI
 {
@@ -34,10 +30,12 @@ namespace NCMDumpGUI
         public uint GradientColor;
         public int AnimationId;
     }
+
     public enum WINDOWCOMPOSITIONATTRIB
     {
         WCA_ACCENT_POLICY = 19
     }
+
     [StructLayout(LayoutKind.Sequential)]
     public struct WINCOMPATTRDATA
     {
@@ -51,7 +49,7 @@ namespace NCMDumpGUI
     /// </summary>
     public partial class MainWindow : BlurWindow
     {
-        NCMDump Core = new NCMDump();
+        private NCMDump Core = new NCMDump();
 
         [DllImport("user32.dll")]
         public static extern int SetWindowCompositionAttribute(IntPtr hwnd, ref WINCOMPATTRDATA data);
@@ -59,10 +57,10 @@ namespace NCMDumpGUI
         public ObservableCollection<NCMProcessStatus> NCMCollection { get; set; }
          = new ObservableCollection<NCMProcessStatus>();
 
-        IntPtr Hwnd;
+        private IntPtr Hwnd;
 
         public MainWindow()
-        {       
+        {
             InitializeComponent();
             WorkingList.ItemsSource = NCMCollection;
             App.Current.Resources["BlurGradientValue"] = 0xaaffffff;
@@ -123,14 +121,15 @@ namespace NCMDumpGUI
                     if (await Task.Run(() => Core.ConvertAsync(NCMCollection[i].FilePath)))
                     {
                         NCMCollection[i].FileStatus = "Success";
-                        Dispatcher.Invoke(()=> this.UpdateLayout());
+                        Dispatcher.Invoke(() => this.UpdateLayout());
+                        try { File.Delete(NCMCollection[i].FilePath); } catch { }
                     }
                     else
                     {
                         NCMCollection[i].FileStatus = "Fail";
                         Dispatcher.Invoke(() => this.UpdateLayout());
                     }
-                } 
+                }
             });
         }
 
@@ -172,6 +171,5 @@ namespace NCMDumpGUI
         {
             Environment.Exit(0);
         }
-
     }
 }

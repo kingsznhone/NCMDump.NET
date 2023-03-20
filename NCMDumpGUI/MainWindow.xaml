@@ -5,35 +5,38 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NCMDumpGUI"
-        mc:Ignorable="d"   
+        mc:Ignorable="d"
         BorderThickness ="0"
         Style="{StaticResource WindowBlur}"
-        Title="NCMDumpGUI" 
-        Height="480" Width="720" 
-        Icon="/NCMDump.png" 
-        MinWidth="720" MinHeight="480" 
-        ResizeMode="CanResize" 
-        WindowStartupLocation="CenterScreen" 
-        AllowDrop="True" 
+        Title="NCMDumpGUI"
+        Height="480" Width="720"
+        Icon="/NCMDump.png"
+        MinWidth="720" MinHeight="480"
+        ResizeMode="CanResize"
+        WindowStartupLocation="CenterScreen"
+        AllowDrop="True"
         Closed="Window_Closed">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="6*"/>
-            <RowDefinition Height="75"/>
+            <RowDefinition Height="6*" />
+            <RowDefinition Height="40" />
+            <RowDefinition Height="75" />
         </Grid.RowDefinitions>
 
         <ListView Style="{StaticResource ListView.Small}" Background="Transparent" x:Name="WorkingList" ItemsSource="{Binding NCMCollection}"  Grid.Row="0" SizeChanged="ListView_SizeChanged" AllowDrop="True" Drop="WorkingList_Drop" Margin="20,20,20,20">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="File" DisplayMemberBinding="{Binding FilePath}"/>
-                    <GridViewColumn Header="Status" DisplayMemberBinding="{Binding FileStatus}"/>
+                    <GridViewColumn Header="File" DisplayMemberBinding="{Binding FilePath}" />
+                    <GridViewColumn Header="Status" DisplayMemberBinding="{Binding FileStatus}" />
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button x:Name="StartButton" Content="Convert" HorizontalAlignment="Right" Margin="0,0,20,20" Click="StartButton_Click" Grid.Row="1"  Style="{StaticResource ButtonPrimary}" VerticalAlignment="Bottom" Height="35" Width="120" FontSize="14"/>
-        <Button x:Name="SelectFileButton" Content="Select File" HorizontalAlignment="Right" Click="SelectFileButton_Click" Grid.Row="1" Style="{StaticResource ButtonInfo}" VerticalAlignment="Bottom" Height="35" Width="120" Margin="0,0,160,20" FontSize="14"/>
-        <Button x:Name="SelectFolderButton" Content="Select Folder" HorizontalAlignment="Right" Click="SelectFolderButton_Click" Grid.Row="1" Style="{StaticResource ButtonInfo}" VerticalAlignment="Bottom" Height="35" Width="120" Margin="0,0,300,20" FontSize="14"/>
-        <Button x:Name="ClearButton" Content="Clear" HorizontalAlignment="Left" Click="ClearButton_Click" Grid.Row="1" Style="{StaticResource ButtonDanger}" VerticalAlignment="Bottom" Height="35" Width="120" Margin="20,0,0,20" FontSize="14"/>
-    </Grid>
 
+        <CheckBox x:Name="Check_DeleteSource" Content="Delete .NCM file when done" HorizontalAlignment="Right" Margin="0,0,20,0" Grid.Row="1" IsChecked="True" FontSize="14" VerticalAlignment="Stretch" />
+
+        <Button x:Name="StartButton" Content="Convert" HorizontalAlignment="Right" Margin="0,0,20,20" Click="StartButton_Click" Grid.Row="2"  Style="{StaticResource ButtonPrimary}" VerticalAlignment="Bottom" Height="35" Width="120" FontSize="14" />
+        <Button x:Name="SelectFileButton" Content="Select File" HorizontalAlignment="Right" Click="SelectFileButton_Click" Grid.Row="2" Style="{StaticResource ButtonInfo}" VerticalAlignment="Bottom" Height="35" Width="120" Margin="0,0,160,20" FontSize="14" />
+        <Button x:Name="SelectFolderButton" Content="Select Folder" HorizontalAlignment="Right" Click="SelectFolderButton_Click" Grid.Row="2" Style="{StaticResource ButtonInfo}" VerticalAlignment="Bottom" Height="35" Width="120" Margin="0,0,300,20" FontSize="14" />
+        <Button x:Name="ClearButton" Content="Clear" HorizontalAlignment="Left" Click="ClearButton_Click" Grid.Row="2" Style="{StaticResource ButtonDanger}" VerticalAlignment="Bottom" Height="35" Width="120" Margin="20,0,0,20" FontSize="14" />
+    </Grid>
 </hc:BlurWindow>
