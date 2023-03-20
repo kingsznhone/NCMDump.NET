@@ -14,7 +14,8 @@ Keep ID3 tags and cover image.
 
 ### v1.5
 
-Upgrade to .Net 7 Runtime  [Download Link](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-7.0.4-windows-x64-installer ".NET 7.0 Desktop Runtime (v7.0.4) - Windows x64 Installer")
+Upgrade to .Net 7 Runtime with so Fxxxxxx high performance.
+[Download Link](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-7.0.4-windows-x64-installer ".NET 7.0 Desktop Runtime (v7.0.4) - Windows x64 Installer")
 
 Add check box: Delete .ncm file when done 
 
@@ -93,5 +94,8 @@ File Path to a NCM file.
 ```bool``` True if convert success
 
 ## Refrence
+<https://github.com/mono/taglib-sharp>
+
+<https://github.com/HandyOrg/HandyControl>
 
 <https://github.com/anonymous5l/ncmdump>
