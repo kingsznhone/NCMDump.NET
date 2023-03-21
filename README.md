@@ -99,3 +99,7 @@ File Path to a NCM file.
 <https://github.com/HandyOrg/HandyControl>
 
 <https://github.com/anonymous5l/ncmdump>
+
+## Stargazers over time
+
+[![Stargazers over time](https://starchart.cc/kingsznhone/NCMDump.NET.svg)](https://starchart.cc/kingsznhone/NCMDump.NET)
