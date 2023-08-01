@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Net;
+﻿using System.Net;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
 using System.Security.Cryptography;
@@ -11,7 +10,7 @@ namespace NCMDumpCore
 {
     public class NCMDump
     {
-        public readonly int vectorSize = Vector256<byte>.Count;
+        private readonly int vectorSize = Vector256<byte>.Count;
         private readonly byte[] coreKey = { 0x68, 0x7A, 0x48, 0x52, 0x41, 0x6D, 0x73, 0x6F, 0x35, 0x6B, 0x49, 0x6E, 0x62, 0x61, 0x78, 0x57 };
         private readonly byte[] metaKey = { 0x23, 0x31, 0x34, 0x6C, 0x6A, 0x6B, 0x5F, 0x21, 0x5C, 0x5D, 0x26, 0x30, 0x55, 0x3C, 0x27, 0x28 };
 
@@ -51,8 +50,7 @@ namespace NCMDumpCore
             using (AesCng aes = new AesCng() { Key = coreKey, Mode = CipherMode.ECB })
             {
                 var decrypter = aes.CreateDecryptor();
-                // 17 = len("neteasecloudmusic")
-                buffer = decrypter.TransformFinalBlock(buffer.ToArray(), 0, buffer.Length).Skip(17).ToArray();
+                buffer = decrypter.TransformFinalBlock(buffer.ToArray(), 0, buffer.Length).Skip(17).ToArray(); // 17 = len("neteasecloudmusic")
             }
             return buffer.ToArray();
         }
@@ -89,19 +87,6 @@ namespace NCMDumpCore
 
                 var MetaJsonString = Encoding.UTF8.GetString(buffer).Replace("music:", "");
                 MetaInfo metainfo = JsonSerializer.Deserialize<MetaInfo>(MetaJsonString);
-
-                #region for debug use
-
-                //// Inverse to json and verify
-                //var options = new JsonSerializerOptions
-                //{
-                //    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
-                //    WriteIndented = true
-                //};
-                //Console.WriteLine(JsonSerializer.Serialize(metainfo, options));
-
-                #endregion for debug use
-
                 return metainfo;
             }
         }
@@ -110,11 +95,7 @@ namespace NCMDumpCore
         {
             using (RC4_NCM_Stream rc4s = new RC4_NCM_Stream(ms, Key))
             {
-                using (BinaryReader reader = new BinaryReader(rc4s))
-                {
-                    //read to end
-                    return reader.ReadBytes((int)ms.Length - (int)ms.Position);
-                }
+                return rc4s.ToArray();
             }
         }
 
@@ -122,7 +103,7 @@ namespace NCMDumpCore
         {
             var tagfile = TagLib.File.Create(fileName);
 
-            //Use Embedded Picture 
+            //Use Embedded Picture
             if (ImgData is not null)
             {
                 var PicEmbedded = new Picture(new ByteVector(ImgData));
@@ -210,6 +191,7 @@ namespace NCMDumpCore
                 Console.WriteLine("Not a NCM File");
                 return false;
             }
+
             // skip 2 bytes
             ms.Seek(2, SeekOrigin.Current);
 
@@ -223,7 +205,7 @@ namespace NCMDumpCore
             //CRC32 Check
             var crc32bytes = new byte[4];
             ms.Read(crc32bytes, 0, crc32bytes.Length);
-            var crc32len = BitConverter.ToInt32(crc32bytes);
+            var crc32len = MemoryMarshal.Read<int>(crc32bytes);
 
             // skip 5 character,
             ms.Seek(5, SeekOrigin.Current);

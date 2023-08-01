@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace NCMDumpCore
+﻿namespace NCMDumpCore
 {
     /// <summary>
     /// In Cloud Music. There is a modified RC4 encryptor.
@@ -8,47 +6,35 @@ namespace NCMDumpCore
     /// </summary>
     public class RC4_NCM
     {
-        public byte[] Keybox;
+        private byte[] Keybox;
         private int i = 0, j = 0;
 
         public RC4_NCM(byte[] key)
         {
-            Keybox = new byte[256];
-
-            for (int k = 0; k < 256; k++)
-            {
-                Keybox[k] = (byte)k;
-            }
+            Keybox = Enumerable.Range(0, 256).Select(i => (byte)i).ToArray();
 
             //Generate Keybox
-            j = 0;
-            for (int i = 0; i < 256; i++)
+            for (int x = 0, y = 0; x < 256; x++)
             {
-                j = (j + Keybox[i] + key[i % key.Length]) & 0xFF;
-                (Keybox[i], Keybox[j]) = (Keybox[j], Keybox[i]);
+                y = (y + Keybox[x] + key[x % key.Length]) & 0xFF;
+                (Keybox[x], Keybox[y]) = (Keybox[y], Keybox[x]);
             }
-            i = j = 0;
         }
 
-        public byte[] Encrypt(byte[] data)
+        public unsafe byte[] Encrypt(byte[] data)
         {
-            byte[] encrypted = new byte[data.Length];
-            for (int m = 0; m < data.Length; m++)
-            {
-                i = (i + 1) & 0xFF;
-                j = (i + Keybox[i]) & 0xFF;
-                encrypted[m] = (byte)(data[m] ^ Keybox[(Keybox[i] + Keybox[j]) & 0xFF]);
-            }
-            return encrypted;
+            Span<byte> span = new Span<byte>(data);
+            Encrypt(ref span);
+            return span.ToArray();
         }
 
-        public int Encrypt(Span<byte> data)
+        public int Encrypt(ref Span<byte> data)
         {
             for (int m = 0; m < data.Length; m++)
             {
                 i = (i + 1) & 0xFF;
                 j = (i + Keybox[i]) & 0xFF;
-                data[m] = (byte)(data[m] ^ Keybox[(Keybox[i] + Keybox[j]) & 0xFF]);
+                data[m] ^= Keybox[(Keybox[i] + Keybox[j]) & 0xFF];
             }
             return data.Length;
         }
@@ -60,8 +46,7 @@ namespace NCMDumpCore
 
         public int Decrypt(Span<byte> data)
         {
-            return Encrypt(data);
+            return Encrypt(ref data);
         }
     }
-
 }

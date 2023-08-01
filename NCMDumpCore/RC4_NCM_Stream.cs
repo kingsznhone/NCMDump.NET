@@ -29,16 +29,21 @@
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            int bytesRead = innerStream.Read(buffer, offset, count);
-            byte[] decryptedBytes = rc4.Encrypt(buffer[offset..(offset + bytesRead)]);
-            Array.Copy(decryptedBytes, 0, buffer, offset, decryptedBytes.Length);
+            Span<byte> span = new byte[count];
+            innerStream.Seek(offset, SeekOrigin.Current);
+            int bytesRead = Read(span);
+            span.CopyTo(buffer);
+
+            //int bytesRead = innerStream.Read(buffer, offset, count);
+            //byte[] decryptedBytes = rc4.Encrypt(buffer[offset..(offset + bytesRead)]);
+            //Array.Copy(decryptedBytes, 0, buffer, offset, decryptedBytes.Length);
             return bytesRead;
         }
 
         public override int Read(Span<byte> buffer)
         {
             int bytesRead = innerStream.Read(buffer);
-            rc4.Encrypt(buffer);
+            rc4.Encrypt(ref buffer);
             return bytesRead;
         }
 
@@ -54,14 +59,27 @@
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            byte[] encryptedBytes = rc4.Encrypt(buffer[offset..(offset + count)]);
-            innerStream.Write(encryptedBytes, 0, encryptedBytes.Length);
+            Span<byte> span = buffer[offset..(offset + count)];
+
+            int bytesWrite = rc4.Encrypt(ref span);
+
+            innerStream.Write(span);
         }
 
         public override void Write(ReadOnlySpan<byte> buffer)
         {
-            byte[] encryptedBytes = rc4.Encrypt(buffer.ToArray());
-            innerStream.Write(encryptedBytes, 0, encryptedBytes.Length);
+            Span<byte> span = new byte[buffer.Length];
+            buffer.CopyTo(span);
+            int bytesWrite = rc4.Encrypt(ref span);
+
+            innerStream.Write(buffer);
+        }
+
+        public byte[] ToArray()
+        {
+            Span<byte> buffer = new byte[innerStream.Length];
+            Read(buffer);
+            return buffer.ToArray();
         }
     }
 }
