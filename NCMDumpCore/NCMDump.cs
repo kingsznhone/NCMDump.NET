@@ -1,4 +1,7 @@
-﻿using System.Net;
+﻿using System.Diagnostics;
+using System.Net;
+using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -8,89 +11,88 @@ namespace NCMDumpCore
 {
     public class NCMDump
     {
-        readonly byte[] coreKey = { 0x68, 0x7A, 0x48, 0x52, 0x41, 0x6D, 0x73, 0x6F, 0x35, 0x6B, 0x49, 0x6E, 0x62, 0x61, 0x78, 0x57 };
-        readonly byte[] metaKey = { 0x23, 0x31, 0x34, 0x6C, 0x6A, 0x6B, 0x5F, 0x21, 0x5C, 0x5D, 0x26, 0x30, 0x55, 0x3C, 0x27, 0x28 };
+        public readonly int vectorSize = Vector256<byte>.Count;
+        private readonly byte[] coreKey = { 0x68, 0x7A, 0x48, 0x52, 0x41, 0x6D, 0x73, 0x6F, 0x35, 0x6B, 0x49, 0x6E, 0x62, 0x61, 0x78, 0x57 };
+        private readonly byte[] metaKey = { 0x23, 0x31, 0x34, 0x6C, 0x6A, 0x6B, 0x5F, 0x21, 0x5C, 0x5D, 0x26, 0x30, 0x55, 0x3C, 0x27, 0x28 };
 
-        public NCMDump() 
-        {
-        }
         private bool ReadHeader(ref MemoryStream ms)
         {
-            byte[] header = new byte[8];
-            ms.Read(header, 0, header.Length);
+            Span<byte> header = stackalloc byte[8];
+            ms.Read(header);
             // Header Should be "CTENFDAM"
-            return Enumerable.SequenceEqual(header, new byte[] { 067, 084, 069, 078, 070, 068, 065, 077 });
+            return Enumerable.SequenceEqual(header.ToArray(), new byte[] { 067, 084, 069, 078, 070, 068, 065, 077 });
         }
 
-        private byte[] MakeKeybox(ref MemoryStream ms)
+        private byte[] ReadRC4Key(ref MemoryStream ms)
         {
             // read keybox length
             uint KeyboxLength = ReadUint32(ref ms);
 
-            // read raw keybox data
-            var buffer = new byte[KeyboxLength];
-            ms.Read(buffer, 0, buffer.Length);
-            for (int i = 0; i < buffer.Length; i++)
+            //read raw keybox data
+            Span<byte> buffer = stackalloc byte[(int)KeyboxLength];
+            ref byte ref_b = ref MemoryMarshal.GetReference(buffer);
+            ms.Read(buffer);
+
+            //SIMD XOR 0x64
+            Vector256<byte> xor = Vector256.Create(0x64646464).AsByte();
+            int i;
+            for (i = 0; i <= buffer.Length - vectorSize; i += vectorSize)
+            {
+                var vb = Vector256.LoadUnsafe(ref ref_b, (nuint)i);
+                vb ^= xor;
+                Vector256.StoreUnsafe(vb, ref ref_b, (nuint)i);
+            }
+            for (; i < buffer.Length; i++)
             {
                 buffer[i] ^= 0x64;
             }
 
             // decrypt keybox data
-            using (Aes aes = Aes.Create())
+            using (AesCng aes = new AesCng() { Key = coreKey, Mode = CipherMode.ECB })
             {
-                aes.Key = coreKey;
-                aes.Mode = CipherMode.ECB;
                 var decrypter = aes.CreateDecryptor();
                 // 17 = len("neteasecloudmusic")
-                buffer = decrypter.TransformFinalBlock(buffer, 0, buffer.Length).Skip(17).ToArray();
+                buffer = decrypter.TransformFinalBlock(buffer.ToArray(), 0, buffer.Length).Skip(17).ToArray();
             }
-            byte[] Keybox = Enumerable.Range(0, 256).Select(s => (byte)s).ToArray();
-            byte c = 0;
-            byte lastbyte = 0;
-            byte offset = 0;
-            for (int i = 0; i < Keybox.Length; i++)
-            {
-                var swap = Keybox[i];
-                c = (byte)((swap + lastbyte + buffer[offset]) & 0xff);
-                offset++;
-                if (offset >= buffer.Length)
-                {
-                    offset = 0;
-                }
-                Keybox[i] = Keybox[c];
-                Keybox[c] = swap;
-                lastbyte = c;
-            }
-
-            return Keybox;
+            return buffer.ToArray();
         }
 
         private MetaInfo ReadMeta(ref MemoryStream ms)
         {
             // read meta length
             var MetaLength = ReadUint32(ref ms);
-            var RawMetaData = new byte[MetaLength];
-            ms.Read(RawMetaData, 0, RawMetaData.Length);
-            for (int i = 0; i < RawMetaData.Length; i++)
+            Span<byte> buffer = new byte[(int)MetaLength];
+            ref byte ref_b = ref MemoryMarshal.GetReference(buffer);
+            ms.Read(buffer);
+
+            //SIMD XOR 0x63
+            Vector256<byte> xor = Vector256.Create(0x63636363).AsByte();
+            int i;
+            for (i = 0; i <= buffer.Length - vectorSize; i += vectorSize)
             {
-                RawMetaData[i] ^= 0x63;
+                var vb = Vector256.LoadUnsafe(ref ref_b, (nuint)i);
+                vb ^= xor;
+                Vector256.StoreUnsafe(vb, ref ref_b, (nuint)i);
             }
-            RawMetaData = System.Convert.FromBase64String(Encoding.ASCII.GetString(RawMetaData.Skip(22).ToArray()));
+            for (; i < buffer.Length; i++)
+            {
+                buffer[i] ^= 0x63;
+            }
+
+            buffer = System.Convert.FromBase64String(Encoding.ASCII.GetString(buffer.ToArray()[22..]));
 
             // decrypt meta data which is a json contains info of the song
-            using (Aes aes = Aes.Create())
+            using (AesCng aes = new AesCng() { Key = metaKey, Mode = CipherMode.ECB })
             {
-                aes.Key = metaKey;
-                aes.Mode = CipherMode.ECB;
-                var decrypter = aes.CreateDecryptor();
-                RawMetaData = decrypter.TransformFinalBlock(RawMetaData, 0, RawMetaData.Length);
-                var MetaJsonString = Encoding.UTF8.GetString(RawMetaData).Replace("music:", "");
-                MetaInfo metainfo = new MetaInfo();
+                var cryptor = aes.CreateDecryptor();
+                buffer = cryptor.TransformFinalBlock(buffer.ToArray(), 0, buffer.Length);
 
-                metainfo = JsonSerializer.Deserialize<MetaInfo>(MetaJsonString);
+                var MetaJsonString = Encoding.UTF8.GetString(buffer).Replace("music:", "");
+                MetaInfo metainfo = JsonSerializer.Deserialize<MetaInfo>(MetaJsonString);
+
+                #region for debug use
 
                 //// Inverse to json and verify
-
                 //var options = new JsonSerializerOptions
                 //{
                 //    Encoder = JavaScriptEncoder.Create(UnicodeRanges.All),
@@ -98,38 +100,44 @@ namespace NCMDumpCore
                 //};
                 //Console.WriteLine(JsonSerializer.Serialize(metainfo, options));
 
+                #endregion for debug use
+
                 return metainfo;
             }
         }
 
-        private byte[] ReadAudioData(ref MemoryStream Source, byte[] key_box)
+        private byte[] ReadAudioData(ref MemoryStream ms, byte[] Key)
         {
-            byte[] chunk = new byte[0x8000];
-            int j;
-            using (MemoryStream msDecrypted = new MemoryStream())
+            using (RC4_NCM_Stream rc4s = new RC4_NCM_Stream(ms, Key))
             {
-                while (true)
+                using (BinaryReader reader = new BinaryReader(rc4s))
                 {
-                    if (Source.Read(chunk, 0, chunk.Length) <= 0)
-                    {
-                        break;
-                    }
-                    for (int i = 0; i < chunk.Length; i++)
-                    {
-                        j = (i + 1) & 0xff;
-                        chunk[i] ^= key_box[(key_box[j] + key_box[(key_box[j] + j) & 0xff]) & 0xff];
-                    }
-                    msDecrypted.Write(chunk, 0, chunk.Length);
+                    //read to end
+                    return reader.ReadBytes((int)ms.Length - (int)ms.Position);
                 }
-                return msDecrypted.ToArray();
             }
         }
 
         private void AddTag(string fileName, byte[]? ImgData, MetaInfo metainfo)
         {
-
             var tagfile = TagLib.File.Create(fileName);
-            AddCover(tagfile);
+
+            //Use Embedded Picture 
+            if (ImgData is not null)
+            {
+                var PicEmbedded = new Picture(new ByteVector(ImgData));
+                tagfile.Tag.Pictures = new Picture[] { PicEmbedded };
+            }
+            //Use Internet Picture
+            else if (metainfo.albumPic != "")
+            {
+                byte[]? NetImgData = FetchUrl(new Uri(metainfo.albumPic));
+                if (NetImgData is not null)
+                {
+                    var PicFromNet = new Picture(new ByteVector(NetImgData));
+                    tagfile.Tag.Pictures = new Picture[] { PicFromNet };
+                }
+            }
 
             //Add more infomation
             tagfile.Tag.Title = metainfo.musicName;
@@ -137,28 +145,6 @@ namespace NCMDumpCore
             tagfile.Tag.Album = metainfo.album;
             tagfile.Tag.Subtitle = String.Join(@";", metainfo.alias);
             tagfile.Save();
-
-
-            void AddCover(TagLib.File tagfile)
-            {
-                //Use Embedded Picture
-                if (ImgData != null)
-                {
-                    var PicEmbedded = new Picture(new ByteVector(ImgData));
-                    tagfile.Tag.Pictures = new Picture[] { PicEmbedded };
-                }
-                //Use Internet Picture
-                else if (metainfo.albumPic != "")
-                {
-                    byte[]? NetImgData = FetchUrl(new Uri(metainfo.albumPic));
-                    if (NetImgData != null)
-                    {
-                        var PicFromNet = new Picture(new ByteVector(NetImgData));
-                        tagfile.Tag.Pictures = new Picture[] { PicFromNet };
-                    }
-                }
-                tagfile.Save();
-            }
         }
 
         private byte[]? FetchUrl(Uri uri)
@@ -186,7 +172,6 @@ namespace NCMDumpCore
                     Console.WriteLine("Failed to download album picture: remote returned {0}", response.StatusCode);
                     return null;
                 }
-
             }
             catch (HttpRequestException e)
             {
@@ -198,9 +183,9 @@ namespace NCMDumpCore
 
         private uint ReadUint32(ref MemoryStream ms)
         {
-            byte[] buffer = new byte[4];
-            ms.Read(buffer, 0, buffer.Length);
-            return BitConverter.ToUInt32(buffer);
+            Span<byte> buffer = stackalloc byte[4];
+            ms.Read(buffer);
+            return MemoryMarshal.Read<uint>(buffer);
         }
 
         public bool Convert(string path)
@@ -229,7 +214,7 @@ namespace NCMDumpCore
             ms.Seek(2, SeekOrigin.Current);
 
             //Make Keybox
-            byte[] KeyBox = MakeKeybox(ref ms);
+            byte[] RC4Key = ReadRC4Key(ref ms);
 
             //Read Meta Info
             MetaInfo metainfo = ReadMeta(ref ms);
@@ -240,7 +225,7 @@ namespace NCMDumpCore
             ms.Read(crc32bytes, 0, crc32bytes.Length);
             var crc32len = BitConverter.ToInt32(crc32bytes);
 
-            // skip 5 character, 
+            // skip 5 character,
             ms.Seek(5, SeekOrigin.Current);
 
             // read image length
@@ -258,21 +243,18 @@ namespace NCMDumpCore
             }
 
             // Read Audio Data
-            byte[] AudioData = ReadAudioData(ref ms, KeyBox);
+            byte[] AudioData = ReadAudioData(ref ms, RC4Key);
 
             //Flush Audio Data to disk drive
             string OutputPath = path.Substring(0, path.LastIndexOf("."));
 
             if (format is null or "") format = "mp3";
-            System.IO.File.WriteAllBytes($"{OutputPath}.{format}", AudioData);
+            await System.IO.File.WriteAllBytesAsync($"{OutputPath}.{format}", AudioData);
 
             //Add tag and cover
             AddTag($"{OutputPath}.{format}", ImageData, metainfo);
 
             return true;
         }
-
     }
 }
-
-

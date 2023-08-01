@@ -82,7 +82,7 @@ namespace NCMDumpGUI
         private void WorkingList_Drop(object sender, System.Windows.DragEventArgs e)
         {
             string[] args = (string[])e.Data.GetData(System.Windows.DataFormats.FileDrop);
-            if (args != null && args.Length != 0)
+            if (args is not null && args.Length != 0)
             {
                 foreach (string _path in args)
                 {
@@ -122,7 +122,13 @@ namespace NCMDumpGUI
                     {
                         NCMCollection[i].FileStatus = "Success";
                         Dispatcher.Invoke(() => this.UpdateLayout());
-                        try { File.Delete(NCMCollection[i].FilePath); } catch { }
+                        try 
+                        { 
+                            if (Check_DeleteSource.IsChecked == true)
+                            {
+                                File.Delete(NCMCollection[i].FilePath);
+                            }
+                        } catch { }
                     }
                     else
                     {

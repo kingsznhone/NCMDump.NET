@@ -20,7 +20,7 @@ namespace NCMDumpGUI
 
         protected internal virtual void OnPropertyChanged(string propertyName)
         {
-            if (PropertyChanged != null)
+            if (PropertyChanged is not null)
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 

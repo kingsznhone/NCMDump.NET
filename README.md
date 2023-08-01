@@ -12,6 +12,12 @@ Keep ID3 tags and cover image.
 
 ## Changelog
 
+### v1.6 2023.08.02
+
+Performance Optimization.
+
+Bug fix.
+
 ### v1.5
 
 Upgrade to .Net 7 Runtime with so Fxxxxxx high performance.
