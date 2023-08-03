@@ -16,7 +16,7 @@ Keep ID3 tags and cover image.
 
 Performance Optimization.
 
-####CRITICAL BUG in 1.6. use 1.5
+#### CRITICAL BUG in 1.6. use 1.5
 
 
 ### v1.5
