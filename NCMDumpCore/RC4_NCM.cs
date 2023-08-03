@@ -21,7 +21,7 @@
             }
         }
 
-        public unsafe byte[] Encrypt(byte[] data)
+        public byte[] Encrypt(byte[] data)
         {
             Span<byte> span = new Span<byte>(data);
             Encrypt(ref span);

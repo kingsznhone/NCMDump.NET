@@ -16,18 +16,87 @@
         WindowStartupLocation="CenterScreen"
         AllowDrop="True"
         Closed="Window_Closed">
-    <Grid>
+
+    <hc:BlurWindow.Resources>
+        <Style x:Key="customLV" TargetType="{x:Type ListView}" BasedOn="{StaticResource ListViewBaseStyle}">
+            <Setter Property="hc:GridViewAttach.ColumnHeaderHeight" Value="30" />
+            <Setter Property="ItemContainerStyle" Value="{DynamicResource CustomItem}" />
+        </Style>
+
+
+        <Style x:Key="CustomItem" TargetType="ListViewItem">
+            <Setter Property="Background" Value="{DynamicResource RegionBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="Padding" Value="6,2" />
+            <Setter Property="MinHeight" Value="24" />
+            <Setter Property="Margin" Value="0,0,0,2"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        
+                        <Border CornerRadius="4" x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"  Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                            <GridViewRowPresenter Content="{TemplateBinding Content}" Columns="{TemplateBinding GridView.ColumnCollection}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding FileStatus}" Value="Await">
+                    <Setter Property="Background" Value="AliceBlue"></Setter>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding FileStatus}" Value="Success">
+                    <Setter Property="Background" Value="PaleGreen"></Setter>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding FileStatus}" Value="Failed">
+                    <Setter Property="Background" Value="PaleVioletRed"></Setter>
+                </DataTrigger>
+                
+                <Trigger Property="IsMouseOver" Value="true">
+                    <Setter Property="Background" Value="{DynamicResource DarkDefaultBrush}"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/>
+                    <Setter Property="TextElement.Foreground" Value="{DynamicResource TextIconBrush}"/>
+                </Trigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsSelected" Value="true"/>
+                        <Condition Property="Selector.IsSelectionActive" Value="false"/>
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Background" Value="{DynamicResource DarkDefaultBrush}"/>
+                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+                </MultiTrigger>
+                <Trigger Property="GridView.ColumnCollection" Value="{x:Null}">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListViewItem">
+                                <Border CornerRadius="4" x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
+                                    <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </hc:BlurWindow.Resources>
+
+<Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="6*" />
             <RowDefinition Height="40" />
             <RowDefinition Height="75" />
         </Grid.RowDefinitions>
 
-        <ListView Style="{StaticResource ListView.Small}" Background="Transparent" x:Name="WorkingList" ItemsSource="{Binding NCMCollection}"  Grid.Row="0" SizeChanged="ListView_SizeChanged" AllowDrop="True" Drop="WorkingList_Drop" Margin="20,20,20,20">
+        <ListView Style="{DynamicResource customLV}" Background="Transparent" x:Name="WorkingList" ItemsSource="{Binding NCMCollection}"  Grid.Row="0" SizeChanged="ListView_SizeChanged" AllowDrop="True" Drop="WorkingList_Drop" Margin="20,20,20,20">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="File" DisplayMemberBinding="{Binding FilePath}" />
                     <GridViewColumn Header="Status" DisplayMemberBinding="{Binding FileStatus}" />
+                    <GridViewColumn Header="Elapsed" DisplayMemberBinding="{Binding Elapsedms}" />
                 </GridView>
             </ListView.View>
         </ListView>

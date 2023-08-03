@@ -77,7 +77,7 @@
 
         public byte[] ToArray()
         {
-            Span<byte> buffer = new byte[innerStream.Length];
+            Span<byte> buffer = new byte[innerStream.Length-innerStream.Position];
             Read(buffer);
             return buffer.ToArray();
         }

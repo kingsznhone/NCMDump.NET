@@ -235,7 +235,8 @@ namespace NCMDumpCore
 
             //Add tag and cover
             AddTag($"{OutputPath}.{format}", ImageData, metainfo);
-
+            ms.Flush();
+            ms.Close();
             return true;
         }
     }
