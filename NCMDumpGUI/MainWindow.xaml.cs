@@ -2,6 +2,7 @@
 using NCMDumpCore;
 using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -75,11 +76,12 @@ namespace NCMDumpGUI
             GridView gView = listView.View as GridView;
 
             var workingWidth = listView.ActualWidth - SystemParameters.VerticalScrollBarWidth; // take into account vertical scrollbar
-            var col1 = 0.80;
+            var col1 = 0.60;
             var col2 = 0.20;
-
+            var col3 = 0.20;
             gView.Columns[0].Width = workingWidth * col1;
             gView.Columns[1].Width = workingWidth * col2;
+            gView.Columns[2].Width = workingWidth * col3;
         }
 
         private void WorkingList_Drop(object sender, System.Windows.DragEventArgs e)
@@ -121,8 +123,12 @@ namespace NCMDumpGUI
             {
                 if (NCMCollection[i].FileStatus != "Success")
                 {
-                    if (await Task.Run(() => Core.ConvertAsync(NCMCollection[i].FilePath)))
+                    Stopwatch sw = Stopwatch.StartNew();
+                    sw.Start();
+                    if (await Core.ConvertAsync(NCMCollection[i].FilePath))
                     {
+                        sw.Stop();
+                        NCMCollection[i].Elapsedms = $"{sw.ElapsedMilliseconds:f0}ms";
                         NCMCollection[i].FileStatus = "Success";
                         Dispatcher.Invoke(() => this.UpdateLayout());
                         try
@@ -139,7 +145,9 @@ namespace NCMDumpGUI
                     }
                     else
                     {
-                        NCMCollection[i].FileStatus = "Fail";
+                        sw.Stop();
+                        NCMCollection[i].Elapsedms = $"{sw.ElapsedMilliseconds:f0}ms";
+                        NCMCollection[i].FileStatus = "Failed";
                         Dispatcher.Invoke(() => this.UpdateLayout());
                     }
                 }
