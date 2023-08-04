@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace NCMDumpGUI
@@ -12,6 +7,7 @@ namespace NCMDumpGUI
     public partial class MainWindowViewModel
     {
         private bool _willDeleteNCM;
+
         public bool WillDeleteNCM
         {
             get
@@ -25,9 +21,9 @@ namespace NCMDumpGUI
             }
         }
 
-        public MainWindowViewModel() {
-              WillDeleteNCM = true;
+        public MainWindowViewModel()
+        {
+            WillDeleteNCM = true;
         }
-
     }
 }

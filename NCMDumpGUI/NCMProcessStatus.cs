@@ -9,6 +9,7 @@ namespace NCMDumpGUI
         public string _filestatus;
 
         private string _elapsedms;
+
         public string Elapsedms
         {
             get { return _elapsedms; }
@@ -20,6 +21,7 @@ namespace NCMDumpGUI
             get { return _filestatus; }
             set { _filestatus = value; OnPropertyChanged("FileStatus"); }
         }
+
         public NCMProcessStatus(string _path, string _status)
         {
             FilePath = _path;

@@ -184,9 +184,9 @@ namespace NCMDumpCore
                 Console.WriteLine("File Path Not Exist!");
                 return false;
             }
-            
+
             //Read all bytes to ram.
-            MemoryStream ms =new MemoryStream(await System.IO.File.ReadAllBytesAsync(path));
+            MemoryStream ms = new MemoryStream(await System.IO.File.ReadAllBytesAsync(path));
 
             //Verify Header
             if (!ReadHeader(ref ms))
@@ -202,7 +202,7 @@ namespace NCMDumpCore
             byte[] RC4Key = ReadRC4Key(ref ms);
 
             //Read Meta Info
-            MetaInfo metainfo = ReadMeta(ref ms);
+            MetaInfo metainfo = await Task.Run(() => ReadMeta(ref ms));
             string format = metainfo.format;
 
             //CRC32 Check
@@ -228,7 +228,7 @@ namespace NCMDumpCore
             }
 
             // Read Audio Data
-            byte[] AudioData = ReadAudioData(ref ms, RC4Key);
+            byte[] AudioData = await Task.Run(() => ReadAudioData(ref ms, RC4Key));
 
             //Flush Audio Data to disk drive
             string OutputPath = path.Substring(0, path.LastIndexOf("."));
@@ -237,7 +237,7 @@ namespace NCMDumpCore
             await System.IO.File.WriteAllBytesAsync($"{OutputPath}.{format}", AudioData);
 
             //Add tag and cover
-            AddTag($"{OutputPath}.{format}", ImageData, metainfo);
+            await Task.Run(() => AddTag($"{OutputPath}.{format}", ImageData, metainfo));
             ms.Flush();
             ms.Close();
             return true;

@@ -1,6 +1,4 @@
-﻿using HandyControl.Controls;
-using NCMDumpCore;
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -10,6 +8,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
+using HandyControl.Controls;
+using NCMDumpCore;
 
 namespace NCMDumpGUI
 {
@@ -67,7 +67,6 @@ namespace NCMDumpGUI
             InitializeComponent();
             WorkingList.ItemsSource = NCMCollection;
             App.Current.Resources["BlurGradientValue"] = 0xaaffffff;
-            
         }
 
         private void ListView_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -119,7 +118,7 @@ namespace NCMDumpGUI
 
         private async void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            Parallel.For(0, NCMCollection.Count, async (i, state) =>
+            ParallelLoopResult result = Parallel.For(0, NCMCollection.Count, async (i, state) =>
             {
                 if (NCMCollection[i].FileStatus != "Success")
                 {
@@ -132,15 +131,15 @@ namespace NCMDumpGUI
                         NCMCollection[i].FileStatus = "Success";
                         Dispatcher.Invoke(() => this.UpdateLayout());
                         try
-                        { 
-                            if (this.VM.WillDeleteNCM)
+                        {
+                            if (VM.WillDeleteNCM)
                             {
                                 File.Delete(NCMCollection[i].FilePath);
                             }
-                        } 
+                        }
                         catch (Exception ex)
                         {
-                            
+                            Debug.WriteLine(ex.ToString());
                         }
                     }
                     else
@@ -152,6 +151,16 @@ namespace NCMDumpGUI
                     }
                 }
             });
+
+            if (result.IsCompleted)
+            {
+                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+                GC.WaitForPendingFinalizers();
+            }
+            else
+            {
+                Debug.WriteLine("Paralle Loop Not Complete.");
+            }
         }
 
         private void SelectFileButton_Click(object sender, RoutedEventArgs e)
