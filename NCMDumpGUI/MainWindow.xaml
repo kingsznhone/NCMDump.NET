@@ -32,7 +32,7 @@
             </ListView.View>
         </ListView>
 
-        <CheckBox x:Name="Check_DeleteSource" Content="Delete .NCM file when done" HorizontalAlignment="Right" Margin="0,0,20,0" Grid.Row="1" IsChecked="True" FontSize="14" VerticalAlignment="Stretch" />
+        <CheckBox x:Name="Check_DeleteNCM" IsChecked="{Binding WillDeleteNCM}" Content="Delete .NCM file when done" HorizontalAlignment="Right" Margin="0,0,20,0" Grid.Row="1" FontSize="14" VerticalAlignment="Stretch" />
 
         <Button x:Name="StartButton" Content="Convert" HorizontalAlignment="Right" Margin="0,0,20,20" Click="StartButton_Click" Grid.Row="2"  Style="{StaticResource ButtonPrimary}" VerticalAlignment="Bottom" Height="35" Width="120" FontSize="14" />
         <Button x:Name="SelectFileButton" Content="Select File" HorizontalAlignment="Right" Click="SelectFileButton_Click" Grid.Row="2" Style="{StaticResource ButtonInfo}" VerticalAlignment="Bottom" Height="35" Width="120" Margin="0,0,160,20" FontSize="14" />

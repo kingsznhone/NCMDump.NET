@@ -4,14 +4,14 @@
     <TargetFrameworks>net7.0;</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	  <VersionPrefix>1.6.0</VersionPrefix>
+	  <VersionPrefix>1.6.1</VersionPrefix>
     <AssemblyVersion></AssemblyVersion>
     <FileVersion></FileVersion>
     <Platforms>x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="TagLibSharp" Version="2.2.0" />
+    <PackageReference Include="TagLibSharp" Version="2.3.0" />
   </ItemGroup>
 
 </Project>

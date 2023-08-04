@@ -7,20 +7,9 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>NCMDump.ico</ApplicationIcon>
     <UseWindowsForms>True</UseWindowsForms>
-	<Version>1.6.0</Version>
+	<Version>1.6.1</Version>
 	<Platforms>x64</Platforms>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Resources\**" />
-    <EmbeddedResource Remove="Resources\**" />
-    <None Remove="Resources\**" />
-    <Page Remove="Resources\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="ncmdump.png" />
-  </ItemGroup>
 
   <ItemGroup>
     <Content Include="NCMDump.ico" />
@@ -35,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.1" />
     <PackageReference Include="HandyControl" Version="3.4.0" />
   </ItemGroup>
 

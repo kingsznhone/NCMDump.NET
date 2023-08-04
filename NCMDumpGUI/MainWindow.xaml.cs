@@ -57,13 +57,16 @@ namespace NCMDumpGUI
         public ObservableCollection<NCMProcessStatus> NCMCollection { get; set; }
          = new ObservableCollection<NCMProcessStatus>();
 
-        private IntPtr Hwnd;
+        private MainWindowViewModel VM;
 
         public MainWindow()
         {
+            VM = new MainWindowViewModel();
+            this.DataContext = VM;
             InitializeComponent();
             WorkingList.ItemsSource = NCMCollection;
             App.Current.Resources["BlurGradientValue"] = 0xaaffffff;
+            
         }
 
         private void ListView_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -122,13 +125,17 @@ namespace NCMDumpGUI
                     {
                         NCMCollection[i].FileStatus = "Success";
                         Dispatcher.Invoke(() => this.UpdateLayout());
-                        try 
+                        try
                         { 
-                            if (Check_DeleteSource.IsChecked == true)
+                            if (this.VM.WillDeleteNCM)
                             {
                                 File.Delete(NCMCollection[i].FilePath);
                             }
-                        } catch { }
+                        } 
+                        catch (Exception ex)
+                        {
+                            
+                        }
                     }
                     else
                     {

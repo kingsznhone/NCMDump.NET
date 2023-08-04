@@ -74,12 +74,5 @@
 
             innerStream.Write(buffer);
         }
-
-        public byte[] ToArray()
-        {
-            Span<byte> buffer = new byte[innerStream.Length];
-            Read(buffer);
-            return buffer.ToArray();
-        }
     }
 }

@@ -95,7 +95,10 @@ namespace NCMDumpCore
         {
             using (RC4_NCM_Stream rc4s = new RC4_NCM_Stream(ms, Key))
             {
-                return rc4s.ToArray();
+                byte[] data = new byte[ms.Length - ms.Position];
+                Span<byte> buffer = new Span<byte>(data);
+                rc4s.Read(buffer);
+                return data;
             }
         }
 
@@ -181,9 +184,9 @@ namespace NCMDumpCore
                 Console.WriteLine("File Path Not Exist!");
                 return false;
             }
-
+            
             //Read all bytes to ram.
-            var ms = new MemoryStream(await System.IO.File.ReadAllBytesAsync(path));
+            MemoryStream ms =new MemoryStream(await System.IO.File.ReadAllBytesAsync(path));
 
             //Verify Header
             if (!ReadHeader(ref ms))
