@@ -12,11 +12,20 @@ Keep ID3 tags and cover image.
 
 ## Changelog
 
-### v1.6 2023.08.02
+### v1.6.2 2023.08.05
 
-Performance Optimization.
+Critical Bug Fix
 
-Bug fix.
+UI Improvment
+
+Async Optimized
+
+SIMD Optimized
+
+code cleaning
+
+<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo/Demo1.6.png"/>
+
 
 ### v1.5
 
@@ -25,7 +34,7 @@ Upgrade to .Net 7 Runtime with so Fxxxxxx high performance.
 
 Add check box: Delete .ncm file when done 
 
-<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo2.png"/>
+<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo/Demo1.5.png"/>
 
 ### v1.4
 
@@ -33,7 +42,7 @@ UI adjustment.
 
 Performance Improvement.
 
-<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo1.png"/>
+<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo/Demo1.4.png"/>
 
 ### v1.3
 
