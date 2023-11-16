@@ -1,13 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net7.0;</TargetFrameworks>
+    <TargetFrameworks>net8.0;</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	  <VersionPrefix>1.6.2</VersionPrefix>
+	  <VersionPrefix>1.7.0</VersionPrefix>
     <AssemblyVersion></AssemblyVersion>
     <FileVersion></FileVersion>
     <Platforms>x64</Platforms>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>

@@ -12,6 +12,22 @@ Keep ID3 tags and cover image.
 
 ## Changelog
 
+### v2.0.0 2023.11.17
+
+Move to .NET 8.
+
+[Runtime Download Link](https://dotnet.microsoft.com/zh-cn/download/dotnet/thank-you/runtime-desktop-8.0.0-windows-x64-installer ".NET 8.0 Desktop Runtime (v8.0.0) - Windows x64 Installer")
+
+Add Support for cloud music 3.0.0(beta)
+
+UI Remake.
+
+Dark mode available now. 
+
+<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo/light.png"/>
+
+<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo/dark.png"/>
+
 ### v1.6.2 2023.08.05
 
 Critical Bug Fix
@@ -30,7 +46,7 @@ code cleaning
 ### v1.5
 
 Upgrade to .Net 7 Runtime with so Fxxxxxx high performance.
-[Download Link](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-7.0.4-windows-x64-installer ".NET 7.0 Desktop Runtime (v7.0.4) - Windows x64 Installer")
+[Runtime Download Link](https://dotnet.microsoft.com/en-us/download/dotnet/thank-you/runtime-desktop-7.0.4-windows-x64-installer ".NET 7.0 Desktop Runtime (v7.0.4) - Windows x64 Installer")
 
 Add check box: Delete .ncm file when done 
 
@@ -111,7 +127,7 @@ File Path to a NCM file.
 ## Refrence
 <https://github.com/mono/taglib-sharp>
 
-<https://github.com/HandyOrg/HandyControl>
+<https://github.com/lepoco/wpfui>
 
 <https://github.com/anonymous5l/ncmdump>
 

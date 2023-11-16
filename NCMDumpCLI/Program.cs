@@ -39,8 +39,9 @@ public class NCMDumpCLI
 
         Console.Write("Press Any Key to Exit...");
         Console.ReadLine();
+        return;
 
-        async void WalkThrough(DirectoryInfo dir)
+        void WalkThrough(DirectoryInfo dir)
         {
             Console.WriteLine("DIR: " + dir.FullName);
             foreach (DirectoryInfo d in dir.GetDirectories())
@@ -50,7 +51,7 @@ public class NCMDumpCLI
             foreach (FileInfo f in dir.EnumerateFiles())
             {
                 Console.WriteLine("Converting : " + f.FullName);
-                if (await Core.ConvertAsync(f.FullName)) Console.WriteLine("...OK");
+                if (Core.Convert(f.FullName)) Console.WriteLine("...OK");
                 else Console.WriteLine("...Fail");
                 Console.WriteLine();
             }

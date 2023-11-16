@@ -1,40 +1,29 @@
-﻿using System.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace NCMDumpGUI
 {
-    public class NCMProcessStatus : INotifyPropertyChanged
+    public partial class NCMProcessStatus : ObservableObject
     {
-        public string FilePath { get; set; }
+        private string filePath;
+
+        public string FilePath
+        {
+            get => filePath;
+            set => SetProperty(ref filePath, value);
+        }
 
         public string _filestatus;
 
-        private string _elapsedms;
-
-        public string Elapsedms
-        {
-            get { return _elapsedms; }
-            set { _elapsedms = value; OnPropertyChanged("Elapsedms"); }
-        }
-
         public string FileStatus
         {
-            get { return _filestatus; }
-            set { _filestatus = value; OnPropertyChanged("FileStatus"); }
+            get => _filestatus;
+            set => SetProperty(ref _filestatus, value);
         }
 
         public NCMProcessStatus(string _path, string _status)
         {
             FilePath = _path;
             FileStatus = _status;
-            Elapsedms = "";
         }
-
-        protected internal virtual void OnPropertyChanged(string propertyName)
-        {
-            if (PropertyChanged is not null)
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

@@ -1,9 +1,5 @@
 ﻿namespace NCMDumpCore
 {
-    /// <summary>
-    /// In Cloud Music. There is a modified RC4 encryptor.
-    /// Not standard RC4 algorithm.
-    /// </summary>
     public class RC4_NCM
     {
         private byte[] Keybox;

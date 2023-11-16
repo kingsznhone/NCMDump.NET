@@ -1,108 +1,130 @@
-﻿<hc:BlurWindow x:Class="NCMDumpGUI.MainWindow"
-               xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-               xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-               xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-               xmlns:hc="https://handyorg.github.io/handycontrol"
-               mc:Ignorable="d"
+﻿<ui:FluentWindow x:Class="NCMDumpGUI.MainWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 mc:Ignorable="d"
         BorderThickness ="0"
-        Style="{StaticResource WindowBlur}"
         Title="NCMDumpGUI"
         Height="480" Width="720"
-        Icon="/NCMDump.png"
         MinWidth="720" MinHeight="480"
         ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen"
         AllowDrop="True"
-        Closed="Window_Closed">
+        Closed="Window_Closed"
+        ExtendsContentIntoTitleBar="True"
+        WindowBackdropType="Acrylic">
 
-    <hc:BlurWindow.Resources>
-        <Style x:Key="customLV" TargetType="{x:Type ListView}" BasedOn="{StaticResource ListViewBaseStyle}">
-            <Setter Property="hc:GridViewAttach.ColumnHeaderHeight" Value="30" />
-            <Setter Property="ItemContainerStyle" Value="{DynamicResource CustomItem}" />
-        </Style>
-
-        <Style x:Key="CustomItem" TargetType="ListViewItem">
-            <Setter Property="Background" Value="{DynamicResource RegionBrush}" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
-            <Setter Property="FontSize" Value="12" />
-            <Setter Property="SnapsToDevicePixels" Value="true" />
-            <Setter Property="Padding" Value="6,2" />
-            <Setter Property="MinHeight" Value="24" />
-            <Setter Property="Margin" Value="0,0,0,2" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ListViewItem">
-
-                        <Border CornerRadius="4" x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"  Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
-                            <GridViewRowPresenter Content="{TemplateBinding Content}" Columns="{TemplateBinding GridView.ColumnCollection}" />
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
+    <ui:FluentWindow.Resources>
+        <Style x:Key="FileStatusTextStyle" TargetType="TextBlock">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding FileStatus}" Value="Await">
-                    <Setter Property="Background" Value="AliceBlue"></Setter>
+                    <Setter Property="Foreground" Value="{DynamicResource TextFillColorPrimaryBrush}" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding FileStatus}" Value="Success">
-                    <Setter Property="Background" Value="PaleGreen"></Setter>
+                    <Setter Property="Foreground" Value="Green" />
                 </DataTrigger>
                 <DataTrigger Binding="{Binding FileStatus}" Value="Failed">
-                    <Setter Property="Background" Value="PaleVioletRed"></Setter>
+                    <Setter Property="Foreground" Value="Red" />
                 </DataTrigger>
-
-                <Trigger Property="IsMouseOver" Value="true">
-                    <Setter Property="Background" Value="{DynamicResource DarkDefaultBrush}" />
-                </Trigger>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="{DynamicResource PrimaryBrush}" />
-                    <Setter Property="TextElement.Foreground" Value="{DynamicResource TextIconBrush}" />
-                </Trigger>
-                <MultiTrigger>
-                    <MultiTrigger.Conditions>
-                        <Condition Property="IsSelected" Value="true" />
-                        <Condition Property="Selector.IsSelectionActive" Value="false" />
-                    </MultiTrigger.Conditions>
-                    <Setter Property="Background" Value="{DynamicResource DarkDefaultBrush}" />
-                    <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
-                </MultiTrigger>
-                <Trigger Property="GridView.ColumnCollection" Value="{x:Null}">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="ListViewItem">
-                                <Border CornerRadius="4" x:Name="Bd" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}" SnapsToDevicePixels="true">
-                                    <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                                </Border>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
             </Style.Triggers>
         </Style>
-    </hc:BlurWindow.Resources>
+    </ui:FluentWindow.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="6*" />
-            <RowDefinition Height="40" />
-            <RowDefinition Height="75" />
+            <RowDefinition Height="32" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="60" />
+            <RowDefinition Height="60" />
         </Grid.RowDefinitions>
 
-        <ListView Style="{DynamicResource customLV}" Background="Transparent" x:Name="WorkingList" ItemsSource="{Binding NCMCollection}"  Grid.Row="0" SizeChanged="ListView_SizeChanged" AllowDrop="True" Drop="WorkingList_Drop" Margin="20,20,20,20">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="File" DisplayMemberBinding="{Binding FilePath}" />
-                    <GridViewColumn Header="Status" DisplayMemberBinding="{Binding FileStatus}" />
-                    <GridViewColumn Header="Elapsed" DisplayMemberBinding="{Binding Elapsedms}" />
-                </GridView>
-            </ListView.View>
-        </ListView>
-        <CheckBox x:Name="Check_DeleteNCM" IsChecked="{Binding WillDeleteNCM}" Content="Delete .NCM file when done" HorizontalAlignment="Right" Margin="0,0,20,0" Grid.Row="1" FontSize="14" VerticalAlignment="Stretch" />
+        <ui:TitleBar
+            x:Name="TitleBar"
+            Title="{Binding ApplicationTitle}"
+            Grid.Row="0">
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Source="pack://application:,,,/ncmdump.png" />
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
 
-        <Button x:Name="StartButton" Content="Convert" HorizontalAlignment="Right" Margin="0,0,20,20" Click="StartButton_Click" Grid.Row="2"  Style="{StaticResource ButtonPrimary}" VerticalAlignment="Bottom" Height="35" Width="120" FontSize="14" />
-        <Button x:Name="SelectFileButton" Content="Select File" HorizontalAlignment="Right" Click="SelectFileButton_Click" Grid.Row="2" Style="{StaticResource ButtonInfo}" VerticalAlignment="Bottom" Height="35" Width="120" Margin="0,0,160,20" FontSize="14" />
-        <Button x:Name="SelectFolderButton" Content="Select Folder" HorizontalAlignment="Right" Click="SelectFolderButton_Click" Grid.Row="2" Style="{StaticResource ButtonInfo}" VerticalAlignment="Bottom" Height="35" Width="120" Margin="0,0,300,20" FontSize="14" />
-        <Button x:Name="ClearButton" Content="Clear" HorizontalAlignment="Left" Click="ClearButton_Click" Grid.Row="2" Style="{StaticResource ButtonDanger}" VerticalAlignment="Bottom" Height="35" Width="120" Margin="20,0,0,20" FontSize="14" />
+        <ui:DataGrid x:Name="WorkingList"
+                     ItemsSource="{Binding NCMCollection}"
+                     AutoGenerateColumns="False" Grid.Row="1" Margin="24,24,24,0"
+                     IsSynchronizedWithCurrentItem="True"
+                     IsReadOnly="True"
+                     AllowDrop="True"
+                     SizeChanged="DataGrid_SizeChanged"
+                     Drop="WorkingList_Drop"
+                     Background="#00000000">
+            <ui:DataGrid.Columns>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="File Path" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="16,0,0,0" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding FilePath}" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="16,0,0,0" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.HeaderTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="Status" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.HeaderTemplate>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding FileStatus}"
+                                       Style="{DynamicResource FileStatusTextStyle}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </ui:DataGrid.Columns>
+        </ui:DataGrid>
+
+        <ui:Button Name="Btn_Theme" Content="Light" Icon="{ui:SymbolIcon Lightbulb24}"
+                   Width="120" Margin="24,0,0,0"  Grid.Row="2"
+                   HorizontalAlignment="Left" VerticalAlignment="Center"
+                   Command="{Binding ThemeCommand}" />
+
+        <CheckBox x:Name="Check_DeleteNCM"
+                  IsChecked="{Binding WillDeleteNCM}"
+                  Content="Delete .NCM file when done"
+                  Margin="0,0,24,0"
+                  Grid.Row="2"
+                  FontSize="14"
+                  VerticalAlignment="Center"
+                  HorizontalAlignment="Right" />
+
+        <ui:Button x:Name="StartButton" Content="Convert" FontSize="14"
+                    Width="120" Margin="0,0,24,24" Grid.Row="3"
+                   HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                   Appearance="Success"
+                   Command="{Binding ConvertCommand}" />
+
+        <ui:Button x:Name="SelectFileButton" Content="Select File" FontSize="14"
+                   Width="120" Margin="0,0,152,24" Grid.Row="3"
+                   HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                   Appearance="Primary"
+                   Command="{Binding AddFileCommand}" />
+
+        <ui:Button x:Name="SelectFolderButton" Content="Select Folder" FontSize="14"
+                    Width="120" Margin="0,0,280,24" Grid.Row="3"
+                   HorizontalAlignment="Right"  VerticalAlignment="Bottom"
+                   Appearance="Primary"
+                   Command="{Binding AddFolderCommand}" />
+
+        <ui:Button x:Name="ClearButton" Content="Clear" FontSize="14"
+                   Width="120" Margin="24,0,0,24" Grid.Row="3"
+                   HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                   Appearance="Danger"
+                   Command="{Binding ClearCommand}" />
     </Grid>
-</hc:BlurWindow>
+</ui:FluentWindow>
