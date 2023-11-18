@@ -14,7 +14,8 @@
         AllowDrop="True"
         Closed="Window_Closed"
         ExtendsContentIntoTitleBar="True"
-        WindowBackdropType="Acrylic">
+        WindowBackdropType="Acrylic"
+                 >
 
     <ui:FluentWindow.Resources>
         <Style x:Key="FileStatusTextStyle" TargetType="TextBlock">
@@ -82,7 +83,7 @@
                         <DataTemplate>
                             <TextBlock Text="{Binding FileStatus}"
                                        Style="{DynamicResource FileStatusTextStyle}"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

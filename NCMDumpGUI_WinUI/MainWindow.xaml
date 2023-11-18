@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window
+    x:Class="NCMDumpGUI_WinUI.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:NCMDumpGUI_WinUI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:models="using:NCMDumpGUI_WinUI.Models"
+    xmlns:animations="using:CommunityToolkit.WinUI.Animations"
+    mc:Ignorable="d"
+
+    Title ="NCMDump GUI">
+
+    <Grid x:Name="RootGrid" RowDefinitions ="48,auto,*,60, 60" VerticalAlignment="Stretch"
+            AllowDrop="True"
+            Drop="WorkingList_Drop"
+            DragOver="Window_DragOver">
+
+        <Grid x:Name="AppTitleBar" VerticalAlignment="Top" Grid.Row="0">
+
+            <Image Source="/Assets/ncmdump.png"
+                   Height="16" VerticalAlignment="Center" HorizontalAlignment ="Left" Margin="16,8,0,0" />
+            <TextBlock x:Name="AppTitle" Text="NCMDump GUI"
+                       VerticalAlignment="Center" HorizontalAlignment ="Left" Margin="44,8,0,0" />
+        </Grid>
+
+        <controls:DataGrid x:Name="WorkingList"
+                           AutoGenerateColumns="False" Grid.Row="1" Margin="24,24,24,0"
+                           VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                           ItemsSource="{Binding NCMCollection}"
+                           SizeChanged ="DataGrid_SizeChanged">
+            <controls:DataGrid.Columns>
+                <controls:DataGridTemplateColumn x:Name="Header_Path" Header="File Path" Tag="File Path">
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="models:NCMProcessStatus">
+                            <TextBlock Text="{Binding FilePath}" VerticalAlignment="Center" HorizontalAlignment ="Left" Margin="8,0,0,0">
+                                <animations:Implicit.ShowAnimations>
+                                    <animations:TranslationAnimation From="0, 20, 0" To="0" Duration="0:0:0.3" />
+                                    <animations:OpacityAnimation From="0" To="1.0"  Duration="0:0:1" />
+                                </animations:Implicit.ShowAnimations>
+
+                                <animations:Implicit.HideAnimations>
+                                    <animations:ScalarAnimation Target="Translation.Y" To="20" Duration="0:0:0.3" />
+                                    <animations:OpacityAnimation To="0.0" Duration="0:0:1" />
+                                </animations:Implicit.HideAnimations>
+                            </TextBlock>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+
+                <controls:DataGridTemplateColumn x:Name="Header_Status" Header="Status"  Tag="Status">
+                    <controls:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="models:NCMProcessStatus">
+                            <TextBlock Text="{Binding FileStatus}"  Foreground="{Binding TextColor}"
+                                       VerticalAlignment="Center" HorizontalAlignment ="Left" Margin="8,0,0,0">
+                                <animations:Implicit.ShowAnimations>
+                                    <animations:TranslationAnimation From="0, 20, 0" To="0" Duration="0:0:0.3" />
+                                    <animations:OpacityAnimation From="0" To="1.0"  Duration="0:0:1" />
+                                </animations:Implicit.ShowAnimations>
+
+                                <animations:Implicit.HideAnimations>
+                                    <animations:ScalarAnimation Target="Translation.Y" To="20" Duration="0:0:0.3" />
+                                    <animations:OpacityAnimation To="0.0" Duration="0:0:1" />
+                                </animations:Implicit.HideAnimations>
+                            </TextBlock>
+                        </DataTemplate>
+                    </controls:DataGridTemplateColumn.CellTemplate>
+                </controls:DataGridTemplateColumn>
+            </controls:DataGrid.Columns>
+        </controls:DataGrid>
+
+        <Grid x:Name="DropGrid" CornerRadius ="8" Grid.Row="2" Background="{ThemeResource CardStrokeColorDefaultBrush}" Margin="24,0,24,0" Visibility="{Binding DropBoxVisible,Mode=TwoWay}">
+            <animations:Implicit.ShowAnimations>
+                <animations:TranslationAnimation From="0, 20, 0" To="0" Duration="0:0:0.5" />
+                <animations:OpacityAnimation From="0" To="1.0"  Duration="0:0:0.5" />
+            </animations:Implicit.ShowAnimations>
+
+            <animations:Implicit.HideAnimations>
+                <animations:ScalarAnimation Target="Translation.Y" To="20" Duration="0:0:0.5" />
+                <animations:OpacityAnimation To="0.0"  Duration="0:0:0.5" />
+            </animations:Implicit.HideAnimations>
+
+            <FontIcon Glyph="&#xE896;" Margin="0,0,0,0" FontSize="48" />
+        </Grid>
+
+        <CheckBox x:Name="Check_DeleteNCM"
+          IsChecked="{Binding WillDeleteNCM,Mode=TwoWay }"
+          Content="Delete .NCM file when done"
+          Margin="0,0,24,0"
+          Grid.Row="3"
+          VerticalAlignment="Center"
+          HorizontalAlignment="Right" />
+
+        <Button Name="StartButton" Style="{StaticResource AccentButtonStyle}"
+
+            Width="120" Margin="0,0,24,24" Grid.Row="4"
+            HorizontalAlignment="Right" VerticalAlignment="Bottom"
+            Command="{Binding ConvertCommand}">
+            <Button.Content>
+                <StackPanel Orientation="Horizontal">
+                    <FontIcon Glyph="&#xE768;" Margin="0,0,8,0" />
+                    <TextBlock>Start</TextBlock>
+                </StackPanel>
+            </Button.Content>
+        </Button>
+
+        <Button x:Name="SelectFileButton"
+           Width="120" Margin="0,0,152,24" Grid.Row="4"
+           HorizontalAlignment="Right" VerticalAlignment="Bottom"
+           Command="{Binding AddFileCommand}">
+            <Button.Content>
+                <StackPanel Orientation="Horizontal">
+                    <FontIcon Glyph="&#xE8E5;" Margin="0,0,8,0" />
+                    <TextBlock>Select File</TextBlock>
+                </StackPanel>
+            </Button.Content>
+        </Button>
+
+        <Button x:Name="SelectFolderButton"
+            Width="120" Margin="0,0,280,24" Grid.Row="4"
+           HorizontalAlignment="Right" VerticalAlignment="Bottom"
+           Command="{Binding AddFolderCommand}">
+            <Button.Content>
+                <StackPanel Orientation="Horizontal">
+                    <FontIcon Glyph="&#xE838;" Margin="0,0,8,0" />
+                    <TextBlock>Select Folder</TextBlock>
+                </StackPanel>
+            </Button.Content>
+        </Button>
+
+        <Button x:Name="ClearButton"
+           Width="120" Margin="24,0,0,24" Grid.Row="4"
+           HorizontalAlignment="Left" VerticalAlignment="Bottom"
+           Command="{Binding ClearCommand}">
+            <Button.Content>
+                <StackPanel Orientation="Horizontal">
+                    <FontIcon Glyph="&#xE74D;" Margin="0,0,8,0" />
+                    <TextBlock>Clear</TextBlock>
+                </StackPanel>
+            </Button.Content>
+        </Button>
+    </Grid>
+</Window>
