@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using NCMDumpCore;
+using OSVersionExtension;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -161,10 +162,27 @@ namespace NCMDumpGUI
             }
         }
 
-        private void SwitchTheme() =>
-            ApplicationThemeManager.Apply(
-            ApplicationThemeManager.GetAppTheme() == ApplicationTheme.Dark ? ApplicationTheme.Light : ApplicationTheme.Dark,
-            ApplicationThemeManager.GetAppTheme() == ApplicationTheme.Dark ? WindowBackdropType.Acrylic : WindowBackdropType.Mica);
+        private void SwitchTheme() {
+            var appTheme = ApplicationThemeManager.GetAppTheme();
+            ApplicationTheme newTheme = appTheme == ApplicationTheme.Dark ? ApplicationTheme.Light : ApplicationTheme.Dark;
+            var  os = OSVersion.GetOperatingSystem();
+            WindowBackdropType backdrop = WindowBackdropType.Acrylic;
+            if (newTheme == ApplicationTheme.Dark)
+            {
+                switch (os)
+                {
+                    case OSVersionExtension.OperatingSystem.Windows10:
+                        backdrop = WindowBackdropType.Acrylic;
+                        break;
+                    case OSVersionExtension.OperatingSystem.Windows11:
+                        backdrop = WindowBackdropType.Mica;
+                        break;
+                    default:
+                        backdrop = WindowBackdropType.None; break;
+                }
+            }
+            ApplicationThemeManager.Apply(newTheme, WindowBackdropType.Acrylic);
+        }
 
         private void ClearList() => NCMCollection.Clear();
     }

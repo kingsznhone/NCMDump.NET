@@ -13,9 +13,16 @@
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
 	<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <PlatformTarget>x64</PlatformTarget>
+    <VersionPrefix>5.0.0</VersionPrefix>
+    <ApplicationIcon>Assets\NCMDump.ico</ApplicationIcon>
+	<Authors>KingsZNHONE@Bilibili</Authors>
+	<NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="ncmdump.png" />
+    <Compile Remove="Helper\**" />
+    <EmbeddedResource Remove="Helper\**" />
+    <None Remove="Helper\**" />
+    <Page Remove="Helper\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,6 +33,7 @@
     <Content Include="Assets\Square44x44Logo.targetsize-24_altform-unplated.png" />
     <Content Include="Assets\StoreLogo.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
+	<Content Include="Assets\ncmdump.png"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -52,15 +60,6 @@
   <ItemGroup>
     <ProjectReference Include="..\NCMDumpCore\NCMDumpCore.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Update="Assets\ncmdump.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Helper\" />
-  </ItemGroup>
-
   <!-- 
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution 
     Explorer "Package and Publish" context menu entry to be enabled for this project even if 
@@ -68,5 +67,11 @@
   -->
   <PropertyGroup Condition="'$(DisableHasPackageAndPublishMenuAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <HasPackageAndPublishMenu>true</HasPackageAndPublishMenu>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
   </PropertyGroup>
 </Project>

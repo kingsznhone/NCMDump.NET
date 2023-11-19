@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <UseWPF>True</UseWPF>
     <ApplicationIcon>NCMDump.ico</ApplicationIcon>
-	<Version>2.0.0</Version>
+	<Version>2.1.0</Version>
 	<Platforms>x64</Platforms>
   </PropertyGroup>
 
@@ -24,6 +24,7 @@
     <PackageReference Include="Microsoft-WindowsAPICodePack-Core" Version="1.1.5" />
     <PackageReference Include="Microsoft-WindowsAPICodePack-Shell" Version="1.1.5" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="OSVersionExt" Version="3.0.0" />
     <PackageReference Include="WPF-UI" Version="3.0.0-preview.9" />
   </ItemGroup>
 

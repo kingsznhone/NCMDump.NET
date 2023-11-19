@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OSVersionExtension;
+using System;
 using System.Windows;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
@@ -15,6 +16,12 @@ namespace NCMDumpGUI
             this.DataContext = VM;
             InitializeComponent();
             SystemThemeWatcher.Watch(this);
+            if (OSVersion.GetOperatingSystem() != OSVersionExtension.OperatingSystem.Windows11)
+            {
+                SystemThemeWatcher.UnWatch(this);
+                Btn_Theme.Visibility = Visibility.Hidden;
+                ApplicationThemeManager.Apply(ApplicationTheme.Light, WindowBackdropType.Acrylic);
+            }
         }
 
         private void DataGrid_SizeChanged(object sender, SizeChangedEventArgs e)
