@@ -14,7 +14,7 @@ namespace NCMDumpGUI
             VM = _vm;
             this.DataContext = VM;
             InitializeComponent();
-            
+
             if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000, 0))
             {
                 SystemThemeWatcher.Watch(this);

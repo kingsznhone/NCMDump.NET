@@ -203,7 +203,6 @@ namespace NCMDumpCore
 
             //Read Meta Info
             MetaInfo metainfo = await Task.Run(() => ReadMeta(ref ms));
-            string format = metainfo.format;
 
             //CRC32 Check
             var crc32bytes = new byte[4];
@@ -233,6 +232,7 @@ namespace NCMDumpCore
             //Flush Audio Data to disk drive
             string OutputPath = path.Substring(0, path.LastIndexOf("."));
 
+            string format = metainfo.format;
             if (format is null or "") format = "mp3";
             await System.IO.File.WriteAllBytesAsync($"{OutputPath}.{format}", AudioData);
 

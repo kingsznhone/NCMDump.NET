@@ -45,17 +45,32 @@ namespace NCMDumpGUI_WinUI
         public MainWindow(MainWindowViewModel _vm)
         {
             VM = _vm;
-
-            this.AppWindow.Resize(new Windows.Graphics.SizeInt32 { Height = 720, Width = 960 });
+            SetWindowPosition();
             this.InitializeComponent();
             this.RootGrid.DataContext = VM;
             this.SystemBackdrop = new DesktopAcrylicBackdrop();
             this.ExtendsContentIntoTitleBar = true;
             this.SetTitleBar(AppTitleBar);
             var datagrid = WorkingList;
-
             theme = new UISettings();
             theme.ColorValuesChanged += UISettings_ColorValuesChanged;
+        }
+
+        private void SetWindowPosition()
+        {
+            this.AppWindow.Resize(new Windows.Graphics.SizeInt32 { Height = 720, Width = 960 });
+
+            if (this.AppWindow is not null)
+            {
+                Microsoft.UI.Windowing.DisplayArea displayArea = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(this.AppWindow.Id, Microsoft.UI.Windowing.DisplayAreaFallback.Nearest);
+                if (displayArea is not null)
+                {
+                    var CenteredPosition = this.AppWindow.Position;
+                    CenteredPosition.X = ((displayArea.WorkArea.Width - this.AppWindow.Size.Width) / 2);
+                    CenteredPosition.Y = ((displayArea.WorkArea.Height - this.AppWindow.Size.Height) / 2);
+                    this.AppWindow.Move(CenteredPosition);
+                }
+            }
         }
 
         private void Window_DragOver(object sender, DragEventArgs e)
@@ -109,6 +124,11 @@ namespace NCMDumpGUI_WinUI
             var workingWidth = grid.ActualWidth;
             grid.Columns[0].Width = new DataGridLength(1, DataGridLengthUnitType.Star);
             grid.Columns[1].Width = new DataGridLength(120);
+        }
+
+        private void Window_Closed(object sender, WindowEventArgs e)
+        {
+            Environment.Exit(0);
         }
     }
 }
