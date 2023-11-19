@@ -10,7 +10,19 @@ Keep ID3 tags and cover image.
 
 <img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Result.png"/>
 
+## System Requirement
+
+ ```Windows 11 10.0.22000.0``` & ```.NET8 Desktop Runtime``` (Recommended)
+
+ ```Windows 10 10.0.19041.0``` & ```.NET8 Desktop Runtime``` (Minimum)
+
 ## Changelog
+
+### v2.1.0 2023.11.19
+
+Fix some UI problem on Windows 10.
+
+Windows 10 might not be fully supported in future.
 
 ### v2.0.0 2023.11.17
 
@@ -87,10 +99,6 @@ Drag .ncm file or directory on exe
 ### GUI
 
 Don't ask, Just use.
-
-## System Requirement
-
-### OS : Windows 10 10.0.19041.0 with .NET7 Desktop Runtime
 
 ## API
 

@@ -161,10 +161,28 @@ namespace NCMDumpGUI
             }
         }
 
-        private void SwitchTheme() =>
-            ApplicationThemeManager.Apply(
-            ApplicationThemeManager.GetAppTheme() == ApplicationTheme.Dark ? ApplicationTheme.Light : ApplicationTheme.Dark,
-            ApplicationThemeManager.GetAppTheme() == ApplicationTheme.Dark ? WindowBackdropType.Acrylic : WindowBackdropType.Mica);
+        private void SwitchTheme() {
+            var appTheme = ApplicationThemeManager.GetAppTheme();
+            ApplicationTheme newTheme = appTheme == ApplicationTheme.Dark ? ApplicationTheme.Light : ApplicationTheme.Dark;
+
+            WindowBackdropType backdrop = WindowBackdropType.Acrylic;
+            if (newTheme ==ApplicationTheme.Dark)
+            {
+                if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000, 0))
+                {
+                    backdrop = WindowBackdropType.Mica;
+                }
+                else if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 19041, 0))
+                {
+                    backdrop = WindowBackdropType.Acrylic;
+                }
+                else
+                {
+                    backdrop = WindowBackdropType.None;
+                }
+            }
+            ApplicationThemeManager.Apply(newTheme, backdrop);
+        }
 
         private void ClearList() => NCMCollection.Clear();
     }
