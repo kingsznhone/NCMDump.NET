@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using NCMDumpCore;
+using OSVersionExtension;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;

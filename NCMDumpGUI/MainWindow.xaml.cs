@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OSVersionExtension;
+using System;
 using System.Windows;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
