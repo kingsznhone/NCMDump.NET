@@ -166,20 +166,22 @@ namespace NCMDumpGUI
             ApplicationTheme newTheme = appTheme == ApplicationTheme.Dark ? ApplicationTheme.Light : ApplicationTheme.Dark;
 
             WindowBackdropType backdrop = WindowBackdropType.Acrylic;
-            if (System.OperatingSystem.IsWindowsVersionAtLeast(10,0,22000,0))
+            if (newTheme ==ApplicationTheme.Dark)
             {
-                backdrop = WindowBackdropType.Mica;
+                if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000, 0))
+                {
+                    backdrop = WindowBackdropType.Mica;
+                }
+                else if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 19041, 0))
+                {
+                    backdrop = WindowBackdropType.Acrylic;
+                }
+                else
+                {
+                    backdrop = WindowBackdropType.None;
+                }
             }
-            else if (System.OperatingSystem.IsWindowsVersionAtLeast(10, 0, 19041, 0))
-            {
-                backdrop = WindowBackdropType.Acrylic;
-            }
-            else
-            {
-                backdrop = WindowBackdropType.None;
-            }
-           
-            ApplicationThemeManager.Apply(newTheme, WindowBackdropType.Acrylic);
+            ApplicationThemeManager.Apply(newTheme, backdrop);
         }
 
         private void ClearList() => NCMCollection.Clear();

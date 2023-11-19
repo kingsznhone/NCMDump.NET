@@ -15,11 +15,11 @@ namespace NCMDumpGUI
             this.DataContext = VM;
             InitializeComponent();
             
-            if (System.OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000, 0))
+            if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000, 0))
             {
                 SystemThemeWatcher.Watch(this);
             }
-            else if (System.OperatingSystem.IsWindowsVersionAtLeast(10, 0, 19041, 0))
+            else if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 19041, 0))
             {
                 Btn_Theme.Visibility = Visibility.Hidden;
                 ApplicationThemeManager.Apply(ApplicationTheme.Light, WindowBackdropType.Acrylic);
