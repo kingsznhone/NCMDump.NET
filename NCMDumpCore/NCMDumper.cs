@@ -8,18 +8,20 @@ using TagLib;
 
 namespace NCMDumpCore
 {
-    public class NCMDump
+    public class NCMDumper
     {
         private readonly int vectorSize = Vector256<byte>.Count;
         private readonly byte[] coreKey = { 0x68, 0x7A, 0x48, 0x52, 0x41, 0x6D, 0x73, 0x6F, 0x35, 0x6B, 0x49, 0x6E, 0x62, 0x61, 0x78, 0x57 };
         private readonly byte[] metaKey = { 0x23, 0x31, 0x34, 0x6C, 0x6A, 0x6B, 0x5F, 0x21, 0x5C, 0x5D, 0x26, 0x30, 0x55, 0x3C, 0x27, 0x28 };
 
-        private bool ReadHeader(ref MemoryStream ms)
+        private bool VerifyHeader(ref MemoryStream ms)
         {
+            // Header Should be "CTENFDAM"
             Span<byte> header = stackalloc byte[8];
             ms.Read(header);
-            // Header Should be "CTENFDAM"
-            return Enumerable.SequenceEqual(header.ToArray(), new byte[] { 067, 084, 069, 078, 070, 068, 065, 077 });
+            long header_num = MemoryMarshal.Read<long>(header);
+            return header_num == 0x4d4144464e455443;
+            //return Enumerable.SequenceEqual(header.ToArray(), new byte[] { 0x43, 0x54, 0x45, 0x4E, 0x46, 0x44, 0x41, 0x4D });
         }
 
         private byte[] ReadRC4Key(ref MemoryStream ms)
@@ -47,9 +49,8 @@ namespace NCMDumpCore
             }
 
             // decrypt keybox data
-            using (AesCng aes = new AesCng() { Key = coreKey, Mode = CipherMode.ECB })
+            using (var decrypter = new AesCng() { Key = coreKey, Mode = CipherMode.ECB }.CreateDecryptor())
             {
-                var decrypter = aes.CreateDecryptor();
                 buffer = decrypter.TransformFinalBlock(buffer.ToArray(), 0, buffer.Length).Skip(17).ToArray(); // 17 = len("neteasecloudmusic")
             }
             return buffer.ToArray();
@@ -80,11 +81,9 @@ namespace NCMDumpCore
             buffer = System.Convert.FromBase64String(Encoding.ASCII.GetString(buffer.ToArray()[22..]));
 
             // decrypt meta data which is a json contains info of the song
-            using (AesCng aes = new AesCng() { Key = metaKey, Mode = CipherMode.ECB })
+            using (var cryptor = new AesCng() { Key = metaKey, Mode = CipherMode.ECB }.CreateDecryptor())
             {
-                var cryptor = aes.CreateDecryptor();
                 buffer = cryptor.TransformFinalBlock(buffer.ToArray(), 0, buffer.Length);
-
                 var MetaJsonString = Encoding.UTF8.GetString(buffer).Replace("music:", "");
                 MetaInfo metainfo = JsonSerializer.Deserialize<MetaInfo>(MetaJsonString);
                 return metainfo;
@@ -125,7 +124,7 @@ namespace NCMDumpCore
 
             //Add more infomation
             tagfile.Tag.Title = metainfo.musicName;
-            tagfile.Tag.Performers = metainfo.artist.Select(x => x[0].GetString()).ToArray();
+            tagfile.Tag.Performers = metainfo.artist.Select(x => x[0]).ToArray();
             tagfile.Tag.Album = metainfo.album;
             tagfile.Tag.Subtitle = String.Join(@";", metainfo.alias);
             tagfile.Save();
@@ -181,7 +180,7 @@ namespace NCMDumpCore
         {
             if (!System.IO.File.Exists(path))
             {
-                Console.WriteLine("File Path Not Exist!");
+                Console.WriteLine($"File {path} Not Exist!");
                 return false;
             }
 
@@ -189,9 +188,9 @@ namespace NCMDumpCore
             MemoryStream ms = new MemoryStream(await System.IO.File.ReadAllBytesAsync(path));
 
             //Verify Header
-            if (!ReadHeader(ref ms))
+            if (!VerifyHeader(ref ms))
             {
-                Console.WriteLine("Not a NCM File");
+                Console.WriteLine($"{path} is not a NCM File");
                 return false;
             }
 

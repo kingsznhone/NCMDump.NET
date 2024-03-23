@@ -17,7 +17,7 @@ namespace NCMDumpGUI
     [ObservableObject]
     public partial class MainWindowViewModel
     {
-        private readonly NCMDump Core;
+        private readonly NCMDumper Core;
 
         private bool _willDeleteNCM;
 
@@ -27,22 +27,22 @@ namespace NCMDumpGUI
             set => SetProperty(ref _willDeleteNCM, value);
         }
 
-        private string _ApplicationTitle;
+        private string _applicationTitle;
 
         public string ApplicationTitle
         {
-            get => _ApplicationTitle;
-            set => _ApplicationTitle = value;
+            get => _applicationTitle;
+            set => SetProperty(ref _applicationTitle, value);
         }
 
         public ObservableCollection<NCMProcessStatus> NCMCollection { get; set; }
 
-        public MainWindowViewModel(NCMDump _core)
+        public MainWindowViewModel(NCMDumper _core)
         {
             Core = _core;
             WillDeleteNCM = true;
             ApplicationTitle = "NCMDump.NET";
-            NCMCollection = new ObservableCollection<NCMProcessStatus>();
+            NCMCollection = new();
             AddFolderCommand = new RelayCommand(FolderDialog);
             AddFileCommand = new RelayCommand(FileDialog);
             ClearCommand = new RelayCommand(ClearList);
@@ -148,7 +148,7 @@ namespace NCMDumpGUI
 
         private void FileDialog()
         {
-            Microsoft.Win32.OpenFileDialog ofp = new Microsoft.Win32.OpenFileDialog();
+            Microsoft.Win32.OpenFileDialog ofp = new();
             ofp.Multiselect = true;
             ofp.Filter = "NCM File(*.ncm)|*.ncm";
             if (ofp.ShowDialog() == true)
@@ -161,12 +161,13 @@ namespace NCMDumpGUI
             }
         }
 
-        private void SwitchTheme() {
+        private void SwitchTheme()
+        {
             var appTheme = ApplicationThemeManager.GetAppTheme();
             ApplicationTheme newTheme = appTheme == ApplicationTheme.Dark ? ApplicationTheme.Light : ApplicationTheme.Dark;
 
             WindowBackdropType backdrop = WindowBackdropType.Acrylic;
-            if (newTheme ==ApplicationTheme.Dark)
+            if (newTheme == ApplicationTheme.Dark)
             {
                 if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000, 0))
                 {

@@ -18,6 +18,10 @@ Keep ID3 tags and cover image.
 
 ## Changelog
 
+### v2.2.0 2024.03.24
+
+Code Cleaning.
+
 ### v2.1.0 2023.11.19
 
 Fix some UI problem on Windows 10.
