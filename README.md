@@ -8,7 +8,7 @@ Highly Optimized Corelib.
 
 Keep ID3 tags and cover image.
 
-<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Result.png"/>
+<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/README/Result.png"/>
 
 ## System Requirement
 
@@ -40,9 +40,9 @@ UI Remake.
 
 Dark mode available now. 
 
-<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo/light.png"/>
+<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/README/light.png"/>
 
-<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo/dark.png"/>
+<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/README/dark.png"/>
 
 ### v1.6.2 2023.08.05
 
@@ -56,7 +56,7 @@ SIMD Optimized
 
 code cleaning
 
-<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo/Demo1.6.png"/>
+<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/README/Demo1.6.png"/>
 
 
 ### v1.5
@@ -66,7 +66,7 @@ Upgrade to .Net 7 Runtime with so Fxxxxxx high performance.
 
 Add check box: Delete .ncm file when done 
 
-<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo/Demo1.5.png"/>
+<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/README/Demo1.5.png"/>
 
 ### v1.4
 
@@ -74,7 +74,7 @@ UI adjustment.
 
 Performance Improvement.
 
-<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo/Demo1.4.png"/>
+<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/README/Demo1.4.png"/>
 
 ### v1.3
 
