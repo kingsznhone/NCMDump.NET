@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "NCMDumpGUI_WinUI (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "NCMDumpGUI_WinUI (Unpackaged)": {
+      "commandName": "Project",
+      "nativeDebugging": false
+    }
+  }
+}

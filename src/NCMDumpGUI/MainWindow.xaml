@@ -4,6 +4,7 @@
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:converter="clr-namespace:NCMDumpGUI.Converter"
                  mc:Ignorable="d"
         BorderThickness ="0"
         Title="NCMDumpGUI"
@@ -30,6 +31,7 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        <converter:InverseBoolConverter x:Key="InverseBoolConverter" />
     </ui:FluentWindow.Resources>
 
     <Grid>
@@ -107,7 +109,8 @@
                     Width="120" Margin="0,0,24,24" Grid.Row="3"
                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
                    Appearance="Success"
-                   Command="{Binding ConvertCommand}" />
+                   Command="{Binding ConvertCommand}"
+                   IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
 
         <ui:Button x:Name="SelectFileButton" Content="Select File" FontSize="14"
                    Width="120" Margin="0,0,152,24" Grid.Row="3"

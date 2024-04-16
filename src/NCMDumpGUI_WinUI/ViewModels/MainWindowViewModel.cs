@@ -1,7 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.WinUI.Helpers;
+using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using NCMDumpCore;
+using NCMDumpGUI_WinUI.Models;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -9,15 +14,14 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using Wpf.Ui.Appearance;
-using Wpf.Ui.Controls;
 
-namespace NCMDumpGUI
+namespace NCMDumpGUI_WinUI.ViewModels
 {
-    [ObservableObject]
-    public partial class MainWindowViewModel
+    public partial class MainWindowViewModel : ObservableObject
     {
         private readonly NCMDump Core;
+        private DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+
         private bool _isBusy = false;
 
         public bool IsBusy
@@ -37,30 +41,44 @@ namespace NCMDumpGUI
         public bool WillDeleteNCM
         {
             get => _willDeleteNCM;
-            set => SetProperty(ref _willDeleteNCM, value);
+            set { SetProperty(ref _willDeleteNCM, value); Debug.WriteLine(WillDeleteNCM); }
         }
 
-        private string _applicationTitle;
+        private string _ApplicationTitle;
 
         public string ApplicationTitle
         {
-            get => _applicationTitle;
-            set => SetProperty(ref _applicationTitle, value);
+            get => _ApplicationTitle;
+            set => _ApplicationTitle = value;
+        }
+
+        private Visibility dropBoxVisible;
+
+        public Visibility DropBoxVisible
+        {
+            get
+            {
+                return dropBoxVisible;
+            }
+            set
+            {
+                SetProperty(ref dropBoxVisible, value);
+            }
         }
 
         public ObservableCollection<NCMProcessStatus> NCMCollection { get; set; }
 
-        public MainWindowViewModel(NCMDumper _core)
+        public MainWindowViewModel(NCMDump _core)
         {
             Core = _core;
             WillDeleteNCM = true;
             ApplicationTitle = "NCMDump.NET";
-            NCMCollection = new();
+            DropBoxVisible = Visibility.Visible;
+            NCMCollection = new ObservableCollection<NCMProcessStatus>();
             AddFolderCommand = new RelayCommand(FolderDialog);
-            AddFileCommand = new RelayCommand(FileDialog);
+            AddFileCommand = new AsyncRelayCommand(FileDialog);
             ClearCommand = new RelayCommand(ClearList);
             ConvertCommand = new AsyncRelayCommand(StartConvert);
-            ThemeCommand = new RelayCommand(SwitchTheme);
         }
 
         public void OnDrop(string[] args)
@@ -74,7 +92,10 @@ namespace NCMDumpGUI
                 else if (new FileInfo(_path).Exists)
                 {
                     if (_path.EndsWith(@".ncm") && !NCMCollection.Any(x => x.FilePath == _path))
+                    {
+                        DropBoxVisible = Visibility.Collapsed;
                         NCMCollection.Add(new NCMProcessStatus(_path, "Await"));
+                    }
                 }
             }
         }
@@ -88,19 +109,22 @@ namespace NCMDumpGUI
             foreach (FileInfo f in dir.EnumerateFiles())
             {
                 if (f.FullName.EndsWith(@".ncm") && !NCMCollection.Any(x => x.FilePath == f.FullName))
+                {
+                    DropBoxVisible = Visibility.Collapsed;
                     NCMCollection.Add(new NCMProcessStatus(f.FullName, "Await"));
+                }
             }
         }
 
         public ICommand AddFolderCommand { get; }
-        public ICommand AddFileCommand { get; }
+        public IAsyncRelayCommand AddFileCommand { get; }
         public ICommand ClearCommand { get; }
         public IAsyncRelayCommand ConvertCommand { get; }
-        public ICommand ThemeCommand { get; }
 
         private async Task StartConvert()
         {
             IsBusy = true;
+            Debug.WriteLine("Clicked");
             await Parallel.ForAsync(0, NCMCollection.Count, async (i, state) =>
             {
                 if (NCMCollection[i].FileStatus != "Success")
@@ -109,7 +133,12 @@ namespace NCMDumpGUI
                     {
                         if (await Core.ConvertAsync(NCMCollection[i].FilePath))
                         {
-                            NCMCollection[i].FileStatus = "Success";
+                            dispatcherQueue.TryEnqueue(() =>
+                            {
+                                NCMCollection[i].FileStatus = "Success";
+                                NCMCollection[i].TextColor = new SolidColorBrush("Green".ToColor());
+                            });
+
                             try
                             {
                                 if (WillDeleteNCM)
@@ -124,18 +153,27 @@ namespace NCMDumpGUI
                         }
                         else
                         {
-                            NCMCollection[i].FileStatus = "Failed";
+                            dispatcherQueue.TryEnqueue(() =>
+                            {
+                                NCMCollection[i].FileStatus = "Failed";
+                                NCMCollection[i].TextColor = new SolidColorBrush("Red".ToColor());
+                            });
                         }
                     }
                     catch
                     {
-                        NCMCollection[i].FileStatus = "Failed";
+                        dispatcherQueue.TryEnqueue(() =>
+                        {
+                            NCMCollection[i].FileStatus = "Failed";
+                            NCMCollection[i].TextColor = new SolidColorBrush("Red".ToColor());
+                        });
                     }
                 }
             });
 
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
             GC.WaitForPendingFinalizers();
+
             IsBusy = false;
         }
 
@@ -143,8 +181,7 @@ namespace NCMDumpGUI
         {
             var dialog = new CommonOpenFileDialog
             {
-                IsFolderPicker = true,
-                Title = "选择文件夹"
+                IsFolderPicker = true
             };
 
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
@@ -154,45 +191,36 @@ namespace NCMDumpGUI
             }
         }
 
-        private void FileDialog()
+        private async Task FileDialog()
         {
-            Microsoft.Win32.OpenFileDialog ofp = new();
+            Microsoft.Win32.OpenFileDialog ofp = new Microsoft.Win32.OpenFileDialog();
             ofp.Multiselect = true;
             ofp.Filter = "NCM File(*.ncm)|*.ncm";
             if (ofp.ShowDialog() == true)
             {
-                foreach (string file in ofp.FileNames)
-                {
-                    if (file.EndsWith(@".ncm") && !NCMCollection.Any(x => x.FilePath == file))
-                        NCMCollection.Add(new NCMProcessStatus(file, "Await"));
-                }
+                OnDrop(ofp.FileNames);
             }
+
+            //WinRT shithole
+
+            //var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((App.Current as App).MainWindow);
+            //FileOpenPicker filePicker = new FileOpenPicker();
+            //filePicker.ViewMode = PickerViewMode.List;
+            //filePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            //filePicker.FileTypeFilter.Add("*");
+            //WinRT.Interop.InitializeWithWindow.Initialize(filePicker, hwnd);
+            //var files = await filePicker.PickMultipleFilesAsync();
+            //if (files != null)
+            //{
+            //    var filelist = files.Select(x => x.Path).ToArray();
+            //    OnDrop(filelist);
+            //}
         }
 
-        private void SwitchTheme()
+        private void ClearList()
         {
-            var appTheme = ApplicationThemeManager.GetAppTheme();
-            ApplicationTheme newTheme = appTheme == ApplicationTheme.Dark ? ApplicationTheme.Light : ApplicationTheme.Dark;
-
-            WindowBackdropType backdrop = WindowBackdropType.Acrylic;
-            if (newTheme == ApplicationTheme.Dark)
-            {
-                if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000, 0))
-                {
-                    backdrop = WindowBackdropType.Mica;
-                }
-                else if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 19041, 0))
-                {
-                    backdrop = WindowBackdropType.Acrylic;
-                }
-                else
-                {
-                    backdrop = WindowBackdropType.None;
-                }
-            }
-            ApplicationThemeManager.Apply(newTheme, backdrop);
+            NCMCollection.Clear();
+            DropBoxVisible = Visibility.Visible;
         }
-
-        private void ClearList() => NCMCollection.Clear();
     }
 }

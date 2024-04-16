@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCMDumpCLI", "NCMDumpCLI\NC
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NCMDumpGUI", "NCMDumpGUI\NCMDumpGUI.csproj", "{F4B097C1-58BB-4A79-8997-8225639D2A92}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NCMDumpGUI_WinUI", "NCMDumpGUI_WinUI\NCMDumpGUI_WinUI.csproj", "{1F6956D8-3F8D-4F68-893E-790329FAA441}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -41,6 +43,12 @@ Global
 		{F4B097C1-58BB-4A79-8997-8225639D2A92}.Release|Any CPU.Build.0 = Release|x64
 		{F4B097C1-58BB-4A79-8997-8225639D2A92}.Release|x64.ActiveCfg = Release|x64
 		{F4B097C1-58BB-4A79-8997-8225639D2A92}.Release|x64.Build.0 = Release|x64
+		{1F6956D8-3F8D-4F68-893E-790329FAA441}.Debug|x64.ActiveCfg = Debug|x64
+		{1F6956D8-3F8D-4F68-893E-790329FAA441}.Debug|x64.Build.0 = Debug|x64
+		{1F6956D8-3F8D-4F68-893E-790329FAA441}.Debug|x64.Deploy.0 = Debug|x64
+		{1F6956D8-3F8D-4F68-893E-790329FAA441}.Release|x64.ActiveCfg = Release|x64
+		{1F6956D8-3F8D-4F68-893E-790329FAA441}.Release|x64.Build.0 = Release|x64
+		{1F6956D8-3F8D-4F68-893E-790329FAA441}.Release|x64.Deploy.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
