@@ -8,9 +8,25 @@ Highly Optimized Corelib.
 
 Keep ID3 tags and cover image.
 
-<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Result.png"/>
+<img src="./README/Result.png"/>
+
+## System Requirement
+
+ ```Windows 11 10.0.22000.0``` & ```.NET8 Desktop Runtime``` (Recommended)
+
+ ```Windows 10 10.0.19041.0``` & ```.NET8 Desktop Runtime``` (Minimum)
 
 ## Changelog
+
+### v2.2.0 2024.03.24
+
+Code Cleaning.
+
+### v2.1.0 2023.11.19
+
+Fix some UI problem on Windows 10.
+
+Windows 10 might not be fully supported in future.
 
 ### v2.0.0 2023.11.17
 
@@ -24,9 +40,9 @@ UI Remake.
 
 Dark mode available now. 
 
-<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo/light.png"/>
+<img src="./README/light.png"/>
 
-<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo/dark.png"/>
+<img src="./README/dark.png"/>
 
 ### v1.6.2 2023.08.05
 
@@ -40,7 +56,7 @@ SIMD Optimized
 
 code cleaning
 
-<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo/Demo1.6.png"/>
+<img src="./README/Demo1.6.png"/>
 
 
 ### v1.5
@@ -50,7 +66,7 @@ Upgrade to .Net 7 Runtime with so Fxxxxxx high performance.
 
 Add check box: Delete .ncm file when done 
 
-<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo/Demo1.5.png"/>
+<img src="./README/Demo1.5.png"/>
 
 ### v1.4
 
@@ -58,7 +74,7 @@ UI adjustment.
 
 Performance Improvement.
 
-<img src="https://github.com/kingsznhone/NCMDump.NET/blob/main/Demo/Demo1.4.png"/>
+<img src="./README/Demo1.4.png"/>
 
 ### v1.3
 
@@ -87,10 +103,6 @@ Drag .ncm file or directory on exe
 ### GUI
 
 Don't ask, Just use.
-
-## System Requirement
-
-### OS : Windows 10 10.0.19041.0 with .NET7 Desktop Runtime
 
 ## API
 

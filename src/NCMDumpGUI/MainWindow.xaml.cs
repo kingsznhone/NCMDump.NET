@@ -42,6 +42,7 @@ namespace NCMDumpGUI
         private void WorkingList_Drop(object sender, System.Windows.DragEventArgs e)
         {
             string[] args = (string[])e.Data.GetData(DataFormats.FileDrop);
+
             if (args is not null && args.Length != 0)
             {
                 VM.OnDrop(args);

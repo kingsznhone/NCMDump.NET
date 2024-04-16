@@ -5,7 +5,7 @@ public class NCMDumpCLI
 {
     public static void Main(string[] args)
     {
-        NCMDump Core = new();
+        NCMDumper Core = new();
 
         if (args.Length == 0)
         {
