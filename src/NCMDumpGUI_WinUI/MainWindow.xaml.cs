@@ -42,10 +42,14 @@ namespace NCMDumpGUI_WinUI
         private DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
         private UISettings theme;
 
+        private DataGridTextColumn column1;
+        private DataGridTextColumn column2;
+
         public MainWindow(MainWindowViewModel _vm)
         {
             VM = _vm;
             SetWindowPosition();
+
             this.InitializeComponent();
             this.RootGrid.DataContext = VM;
             this.SystemBackdrop = new DesktopAcrylicBackdrop();
@@ -58,17 +62,16 @@ namespace NCMDumpGUI_WinUI
 
         private void SetWindowPosition()
         {
-            this.AppWindow.Resize(new Windows.Graphics.SizeInt32 { Height = 720, Width = 960 });
-
-            if (this.AppWindow is not null)
+            if (AppWindow is not null)
             {
+                AppWindow.Resize(new Windows.Graphics.SizeInt32 { Height = 800, Width = 1080 });
                 Microsoft.UI.Windowing.DisplayArea displayArea = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(this.AppWindow.Id, Microsoft.UI.Windowing.DisplayAreaFallback.Nearest);
                 if (displayArea is not null)
                 {
-                    var CenteredPosition = this.AppWindow.Position;
-                    CenteredPosition.X = ((displayArea.WorkArea.Width - this.AppWindow.Size.Width) / 2);
-                    CenteredPosition.Y = ((displayArea.WorkArea.Height - this.AppWindow.Size.Height) / 2);
-                    this.AppWindow.Move(CenteredPosition);
+                    var CenteredPosition = AppWindow.Position;
+                    CenteredPosition.X = ((displayArea.WorkArea.Width - AppWindow.Size.Width) / 2);
+                    CenteredPosition.Y = ((displayArea.WorkArea.Height - AppWindow.Size.Height) / 2);
+                    AppWindow.Move(CenteredPosition);
                 }
             }
         }
@@ -118,12 +121,16 @@ namespace NCMDumpGUI_WinUI
                 });
         }
 
+        private void WorkingList_Loaded(object sender, RoutedEventArgs e)
+        {
+            WorkingList.Columns[0].Width = new DataGridLength(4, DataGridLengthUnitType.Star);
+            WorkingList.Columns[1].Width = new DataGridLength(1, DataGridLengthUnitType.Star);
+        }
+
         private void DataGrid_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            DataGrid grid = sender as DataGrid;
-            var workingWidth = grid.ActualWidth;
-            grid.Columns[0].Width = new DataGridLength(1, DataGridLengthUnitType.Star);
-            grid.Columns[1].Width = new DataGridLength(120);
+            WorkingList.Columns[0].Width = new DataGridLength(4, DataGridLengthUnitType.Star);
+            WorkingList.Columns[1].Width = new DataGridLength(1, DataGridLengthUnitType.Star);
         }
 
         private void Window_Closed(object sender, WindowEventArgs e)

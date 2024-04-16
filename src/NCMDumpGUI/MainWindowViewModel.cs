@@ -2,7 +2,6 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using NCMDumpCore;
-using OSVersionExtension;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -19,6 +18,19 @@ namespace NCMDumpGUI
     public partial class MainWindowViewModel
     {
         private readonly NCMDump Core;
+        private bool _isBusy = false;
+
+        public bool IsBusy
+        {
+            get
+            {
+                return _isBusy;
+            }
+            set
+            {
+                SetProperty(ref _isBusy, value);
+            }
+        }
 
         private bool _willDeleteNCM;
 
@@ -47,7 +59,7 @@ namespace NCMDumpGUI
             AddFolderCommand = new RelayCommand(FolderDialog);
             AddFileCommand = new RelayCommand(FileDialog);
             ClearCommand = new RelayCommand(ClearList);
-            ConvertCommand = new RelayCommand(StartConvert);
+            ConvertCommand = new AsyncRelayCommand(StartConvert);
             ThemeCommand = new RelayCommand(SwitchTheme);
         }
 
@@ -83,12 +95,13 @@ namespace NCMDumpGUI
         public ICommand AddFolderCommand { get; }
         public ICommand AddFileCommand { get; }
         public ICommand ClearCommand { get; }
-        public ICommand ConvertCommand { get; }
+        public IAsyncRelayCommand ConvertCommand { get; }
         public ICommand ThemeCommand { get; }
 
-        private void StartConvert()
+        private async Task StartConvert()
         {
-            ParallelLoopResult result = Parallel.For(0, NCMCollection.Count, async (i, state) =>
+            IsBusy = true;
+            await Parallel.ForAsync(0, NCMCollection.Count, async (i, state) =>
             {
                 if (NCMCollection[i].FileStatus != "Success")
                 {
@@ -121,15 +134,9 @@ namespace NCMDumpGUI
                 }
             });
 
-            if (result.IsCompleted)
-            {
-                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-                GC.WaitForPendingFinalizers();
-            }
-            else
-            {
-                Debug.WriteLine("Paralle Loop Not Complete.");
-            }
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+            GC.WaitForPendingFinalizers();
+            IsBusy = false;
         }
 
         private void FolderDialog()

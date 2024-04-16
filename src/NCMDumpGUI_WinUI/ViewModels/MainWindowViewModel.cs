@@ -20,6 +20,21 @@ namespace NCMDumpGUI_WinUI.ViewModels
     public partial class MainWindowViewModel : ObservableObject
     {
         private readonly NCMDump Core;
+        private DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+
+        private bool _isBusy = false;
+
+        public bool IsBusy
+        {
+            get
+            {
+                return _isBusy;
+            }
+            set
+            {
+                SetProperty(ref _isBusy, value);
+            }
+        }
 
         private bool _willDeleteNCM;
 
@@ -61,9 +76,9 @@ namespace NCMDumpGUI_WinUI.ViewModels
             DropBoxVisible = Visibility.Visible;
             NCMCollection = new ObservableCollection<NCMProcessStatus>();
             AddFolderCommand = new RelayCommand(FolderDialog);
-            AddFileCommand = new RelayCommand(FileDialog);
+            AddFileCommand = new AsyncRelayCommand(FileDialog);
             ClearCommand = new RelayCommand(ClearList);
-            ConvertCommand = new RelayCommand(StartConvert);
+            ConvertCommand = new AsyncRelayCommand(StartConvert);
         }
 
         public void OnDrop(string[] args)
@@ -102,13 +117,15 @@ namespace NCMDumpGUI_WinUI.ViewModels
         }
 
         public ICommand AddFolderCommand { get; }
-        public ICommand AddFileCommand { get; }
+        public IAsyncRelayCommand AddFileCommand { get; }
         public ICommand ClearCommand { get; }
-        public ICommand ConvertCommand { get; }
+        public IAsyncRelayCommand ConvertCommand { get; }
 
-        private void StartConvert()
+        private async Task StartConvert()
         {
-            ParallelLoopResult result = Parallel.For(0, NCMCollection.Count, async (i, state) =>
+            IsBusy = true;
+            Debug.WriteLine("Clicked");
+            await Parallel.ForAsync(0, NCMCollection.Count, async (i, state) =>
             {
                 if (NCMCollection[i].FileStatus != "Success")
                 {
@@ -154,23 +171,17 @@ namespace NCMDumpGUI_WinUI.ViewModels
                 }
             });
 
-            if (result.IsCompleted)
-            {
-                GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
-                GC.WaitForPendingFinalizers();
-            }
-            else
-            {
-                Debug.WriteLine("Paralle Loop Not Complete.");
-            }
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+            GC.WaitForPendingFinalizers();
+
+            IsBusy = false;
         }
 
         private void FolderDialog()
         {
             var dialog = new CommonOpenFileDialog
             {
-                IsFolderPicker = true,
-                Title = "选择文件夹"
+                IsFolderPicker = true
             };
 
             if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
@@ -180,7 +191,7 @@ namespace NCMDumpGUI_WinUI.ViewModels
             }
         }
 
-        private void FileDialog()
+        private async Task FileDialog()
         {
             Microsoft.Win32.OpenFileDialog ofp = new Microsoft.Win32.OpenFileDialog();
             ofp.Multiselect = true;
@@ -189,9 +200,22 @@ namespace NCMDumpGUI_WinUI.ViewModels
             {
                 OnDrop(ofp.FileNames);
             }
-        }
 
-        private DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+            //WinRT shithole
+
+            //var hwnd = WinRT.Interop.WindowNative.GetWindowHandle((App.Current as App).MainWindow);
+            //FileOpenPicker filePicker = new FileOpenPicker();
+            //filePicker.ViewMode = PickerViewMode.List;
+            //filePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            //filePicker.FileTypeFilter.Add("*");
+            //WinRT.Interop.InitializeWithWindow.Initialize(filePicker, hwnd);
+            //var files = await filePicker.PickMultipleFilesAsync();
+            //if (files != null)
+            //{
+            //    var filelist = files.Select(x => x.Path).ToArray();
+            //    OnDrop(filelist);
+            //}
+        }
 
         private void ClearList()
         {

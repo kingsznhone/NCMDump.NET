@@ -35,11 +35,11 @@ namespace NCMDumpGUI_WinUI
             var services = new ServiceCollection();
             ConfigureServices(services);
             _serviceProvider = services.BuildServiceProvider();
-            m_window = _serviceProvider.GetRequiredService<MainWindow>();
-            m_window.Activate();
+            MainWindow = _serviceProvider.GetRequiredService<MainWindow>();
+            MainWindow.Activate();
         }
 
-        private Window m_window;
+        public Window MainWindow;
 
         private void ConfigureServices(IServiceCollection services)
         {
