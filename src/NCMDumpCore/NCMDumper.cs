@@ -11,8 +11,8 @@ namespace NCMDumpCore
     public class NCMDumper
     {
         private readonly int vectorSize = Vector256<byte>.Count;
-        private readonly byte[] coreKey = { 0x68, 0x7A, 0x48, 0x52, 0x41, 0x6D, 0x73, 0x6F, 0x35, 0x6B, 0x49, 0x6E, 0x62, 0x61, 0x78, 0x57 };
-        private readonly byte[] metaKey = { 0x23, 0x31, 0x34, 0x6C, 0x6A, 0x6B, 0x5F, 0x21, 0x5C, 0x5D, 0x26, 0x30, 0x55, 0x3C, 0x27, 0x28 };
+        private readonly byte[] coreKey = [0x68, 0x7A, 0x48, 0x52, 0x41, 0x6D, 0x73, 0x6F, 0x35, 0x6B, 0x49, 0x6E, 0x62, 0x61, 0x78, 0x57];
+        private readonly byte[] metaKey = [0x23, 0x31, 0x34, 0x6C, 0x6A, 0x6B, 0x5F, 0x21, 0x5C, 0x5D, 0x26, 0x30, 0x55, 0x3C, 0x27, 0x28];
 
         private bool VerifyHeader(ref MemoryStream ms)
         {
@@ -35,7 +35,7 @@ namespace NCMDumpCore
             ms.Read(buffer);
 
             //SIMD XOR 0x64
-            Vector256<byte> xor = Vector256.Create(0x64646464).AsByte();
+            Vector256<byte> xor = Vector256.Create((byte)0x64);
             int i;
             for (i = 0; i <= buffer.Length - vectorSize; i += vectorSize)
             {
@@ -49,11 +49,13 @@ namespace NCMDumpCore
             }
 
             // decrypt keybox data
-            using (var decrypter = new AesCng() { Key = coreKey, Mode = CipherMode.ECB }.CreateDecryptor())
+            using (Aes aes = Aes.Create())
             {
-                buffer = decrypter.TransformFinalBlock(buffer.ToArray(), 0, buffer.Length).Skip(17).ToArray(); // 17 = len("neteasecloudmusic")
+                aes.Mode = CipherMode.ECB;
+                aes.Key = coreKey;
+                var cleanText = aes.DecryptEcb(buffer.ToArray(), PaddingMode.PKCS7).ToArray()[17..];
+                return cleanText;
             }
-            return buffer.ToArray();
         }
 
         private MetaInfo ReadMeta(ref MemoryStream ms)
@@ -65,7 +67,7 @@ namespace NCMDumpCore
             ms.Read(buffer);
 
             //SIMD XOR 0x63
-            Vector256<byte> xor = Vector256.Create(0x63636363).AsByte();
+            Vector256<byte> xor = Vector256.Create((byte)0x63);
             int i;
             for (i = 0; i <= buffer.Length - vectorSize; i += vectorSize)
             {
@@ -81,10 +83,12 @@ namespace NCMDumpCore
             buffer = System.Convert.FromBase64String(Encoding.ASCII.GetString(buffer.ToArray()[22..]));
 
             // decrypt meta data which is a json contains info of the song
-            using (var cryptor = new AesCng() { Key = metaKey, Mode = CipherMode.ECB }.CreateDecryptor())
+            using (Aes aes = Aes.Create())
             {
-                buffer = cryptor.TransformFinalBlock(buffer.ToArray(), 0, buffer.Length);
-                var MetaJsonString = Encoding.UTF8.GetString(buffer).Replace("music:", "");
+                aes.Mode = CipherMode.ECB;
+                aes.Key = metaKey;
+                var cleanText = aes.DecryptEcb(buffer.ToArray(), PaddingMode.PKCS7);
+                var MetaJsonString = Encoding.UTF8.GetString(cleanText[6..]);
                 MetaInfo metainfo = JsonSerializer.Deserialize<MetaInfo>(MetaJsonString);
                 return metainfo;
             }
@@ -92,10 +96,10 @@ namespace NCMDumpCore
 
         private async Task<byte[]> ReadAudioData(MemoryStream ms, byte[] Key)
         {
-            using (RC4_NCM_Stream rc4s = new RC4_NCM_Stream(ms, Key))
+            using (RC4_NCM_Stream rc4s = new(ms, Key))
             {
                 byte[] data = new byte[ms.Length - ms.Position];
-                Memory<byte> m_data = new Memory<byte>(data);
+                Memory<byte> m_data = new(data);
                 await rc4s.ReadAsync(m_data);
                 return data;
             }
@@ -132,7 +136,7 @@ namespace NCMDumpCore
 
         private byte[]? FetchUrl(Uri uri)
         {
-            HttpClient client = new HttpClient();
+            HttpClient client = new();
             try
             {
                 var response = client.GetAsync(uri).Result;
@@ -182,7 +186,7 @@ namespace NCMDumpCore
             }
 
             //Read all bytes to ram.
-            MemoryStream ms = new MemoryStream(await System.IO.File.ReadAllBytesAsync(path));
+            MemoryStream ms = new(await System.IO.File.ReadAllBytesAsync(path));
 
             //Verify Header
             if (!VerifyHeader(ref ms))
@@ -201,9 +205,7 @@ namespace NCMDumpCore
             MetaInfo metainfo = ReadMeta(ref ms);
 
             //CRC32 Check
-            var crc32bytes = new byte[4];
-            ms.Read(crc32bytes, 0, crc32bytes.Length);
-            var crc32len = MemoryMarshal.Read<int>(crc32bytes);
+            uint crc32 = ReadUint32(ref ms);
 
             // skip 5 character,
             ms.Seek(5, SeekOrigin.Current);
@@ -226,7 +228,7 @@ namespace NCMDumpCore
             byte[] AudioData = await ReadAudioData(ms, RC4Key);
 
             //Flush Audio Data to disk drive
-            string OutputPath = path.Substring(0, path.LastIndexOf("."));
+            string OutputPath = path[..path.LastIndexOf('.')];
 
             string format = metainfo.format;
             if (format is null or "") format = "mp3";
@@ -234,8 +236,7 @@ namespace NCMDumpCore
 
             //Add tag and cover
             await Task.Run(() => AddTag($"{OutputPath}.{format}", ImageData, metainfo));
-            ms.Flush();
-            ms.Close();
+            await ms.DisposeAsync();
             return true;
         }
     }

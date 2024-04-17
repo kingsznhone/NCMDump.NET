@@ -2,7 +2,7 @@
 {
     public class RC4_NCM
     {
-        private byte[] Keybox;
+        private readonly byte[] Keybox;
         private int i = 0, j = 0;
 
         public RC4_NCM(byte[] key)
@@ -19,7 +19,7 @@
 
         public byte[] Encrypt(byte[] data)
         {
-            Span<byte> span = new Span<byte>(data);
+            Span<byte> span = new(data);
             Encrypt(ref span);
             return span.ToArray();
         }
