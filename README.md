@@ -18,6 +18,19 @@ Keep ID3 tags and cover image.
 
 ## Changelog
 
+### v2.3.0 2024.04.17
+
+Add Backdrop option on WPF version.
+
+<img src="./README/Demo2.3.png">
+
+Add WinUI 3 Publish.
+
+<img src="./README/Demo2.3_WinUI.png">
+
+Async optimize on RC4 Stream
+
+
 ### v2.2.0 2024.03.24
 
 Code Cleaning.

@@ -13,13 +13,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace NCMDumpGUI_WinUI.ViewModels
 {
     public partial class MainWindowViewModel : ObservableObject
     {
-        private readonly NCMDump Core;
+        private readonly NCMDumper Core;
         private DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
         private bool _isBusy = false;
@@ -66,19 +65,47 @@ namespace NCMDumpGUI_WinUI.ViewModels
             }
         }
 
+        public ObservableCollection<SystemBackdrop> BackdropCollection { get; set; }
+
+        private SystemBackdrop _selectedBackdrop;
+
+        public SystemBackdrop SelectedBackdrop
+        {
+            get { return _selectedBackdrop; }
+            set
+            {
+                SetProperty(ref _selectedBackdrop, value);
+                if ((App.Current as App).MainWindow != null)
+                {
+                    (App.Current as App).MainWindow.SystemBackdrop = value;
+                }
+            }
+        }
+
         public ObservableCollection<NCMProcessStatus> NCMCollection { get; set; }
 
-        public MainWindowViewModel(NCMDump _core)
+        public MainWindowViewModel(NCMDumper _core)
         {
             Core = _core;
             WillDeleteNCM = true;
             ApplicationTitle = "NCMDump.NET";
             DropBoxVisible = Visibility.Visible;
             NCMCollection = new ObservableCollection<NCMProcessStatus>();
-            AddFolderCommand = new RelayCommand(FolderDialog);
+            AddFolderCommand = new AsyncRelayCommand(FolderDialog);
             AddFileCommand = new AsyncRelayCommand(FileDialog);
-            ClearCommand = new RelayCommand(ClearList);
-            ConvertCommand = new AsyncRelayCommand(StartConvert);
+            ClearCommand = new AsyncRelayCommand(ClearList, () => NCMCollection.Count > 0);
+            ConvertCommand = new AsyncRelayCommand(StartConvert, () => NCMCollection.Count > 0);
+
+            BackdropCollection = [new MicaBackdrop(), new DesktopAcrylicBackdrop()];
+
+            if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000, 0))
+            {
+                SelectedBackdrop = BackdropCollection.FirstOrDefault(x => x is MicaBackdrop);
+            }
+            else if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 19041, 0))
+            {
+                SelectedBackdrop = BackdropCollection.FirstOrDefault(x => x is DesktopAcrylicBackdrop);
+            }
         }
 
         public void OnDrop(string[] args)
@@ -98,6 +125,8 @@ namespace NCMDumpGUI_WinUI.ViewModels
                     }
                 }
             }
+            ConvertCommand.NotifyCanExecuteChanged();
+            ClearCommand.NotifyCanExecuteChanged();
         }
 
         private void WalkThrough(DirectoryInfo dir)
@@ -116,9 +145,9 @@ namespace NCMDumpGUI_WinUI.ViewModels
             }
         }
 
-        public ICommand AddFolderCommand { get; }
+        public IAsyncRelayCommand AddFolderCommand { get; }
         public IAsyncRelayCommand AddFileCommand { get; }
-        public ICommand ClearCommand { get; }
+        public IAsyncRelayCommand ClearCommand { get; }
         public IAsyncRelayCommand ConvertCommand { get; }
 
         private async Task StartConvert()
@@ -177,7 +206,7 @@ namespace NCMDumpGUI_WinUI.ViewModels
             IsBusy = false;
         }
 
-        private void FolderDialog()
+        private async Task FolderDialog()
         {
             var dialog = new CommonOpenFileDialog
             {
@@ -217,10 +246,12 @@ namespace NCMDumpGUI_WinUI.ViewModels
             //}
         }
 
-        private void ClearList()
+        private async Task ClearList()
         {
             NCMCollection.Clear();
             DropBoxVisible = Visibility.Visible;
+            ConvertCommand.NotifyCanExecuteChanged();
+            ClearCommand.NotifyCanExecuteChanged();
         }
     }
 }

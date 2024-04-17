@@ -35,6 +35,17 @@
             return data.Length;
         }
 
+        public int Encrypt(Memory<byte> data)
+        {
+            for (int m = 0; m < data.Length; m++)
+            {
+                i = (i + 1) & 0xFF;
+                j = (i + Keybox[i]) & 0xFF;
+                data.Span[m] ^= Keybox[(Keybox[i] + Keybox[j]) & 0xFF];
+            }
+            return data.Length;
+        }
+
         public byte[] Decrypt(byte[] data)
         {
             return Encrypt(data);

@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFrameworks>net8.0-windows;</TargetFrameworks>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>True</UseWPF>
     <ApplicationIcon>NCMDump.ico</ApplicationIcon>
-	<Version>2.2.0</Version>
+	<Version>2.3.0</Version>
 	<Platforms>x64</Platforms>
   </PropertyGroup>
 

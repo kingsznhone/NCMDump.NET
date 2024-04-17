@@ -14,8 +14,7 @@
         WindowStartupLocation="CenterScreen"
         AllowDrop="True"
         Closed="Window_Closed"
-        ExtendsContentIntoTitleBar="True"
-        WindowBackdropType="Acrylic">
+        ExtendsContentIntoTitleBar="True">
 
     <ui:FluentWindow.Resources>
         <Style x:Key="FileStatusTextStyle" TargetType="TextBlock">
@@ -32,6 +31,7 @@
             </Style.Triggers>
         </Style>
         <converter:InverseBoolConverter x:Key="InverseBoolConverter" />
+        <converter:BackdropConverter x:Key="BackdropToStringConverter" />
     </ui:FluentWindow.Resources>
 
     <Grid>
@@ -91,10 +91,20 @@
             </ui:DataGrid.Columns>
         </ui:DataGrid>
 
-        <ui:Button Name="Btn_Theme" Content="Light" Icon="{ui:SymbolIcon Lightbulb24}"
-                   Width="120" Margin="24,0,0,0"  Grid.Row="2"
-                   HorizontalAlignment="Left" VerticalAlignment="Center"
-                   Command="{Binding ThemeCommand}" />
+        <ComboBox Width="120"
+                  MinWidth="120"
+            Grid.Row="2"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Left"
+            Margin="24,0,0,0"
+            ItemsSource="{Binding BackdropCollection}"
+            SelectedItem="{Binding SelectedBackdrop,Mode=TwoWay}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Converter={StaticResource BackdropToStringConverter}}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
 
         <CheckBox x:Name="Check_DeleteNCM"
                   IsChecked="{Binding WillDeleteNCM}"
@@ -105,26 +115,24 @@
                   VerticalAlignment="Center"
                   HorizontalAlignment="Right" />
 
-        <ui:Button x:Name="StartButton" Content="Convert" FontSize="14"
+        <ui:Button x:Name="StartButton" Icon="{ui:SymbolIcon PlayMultiple16}" Content="Convert" FontSize="14"
                     Width="120" Margin="0,0,24,24" Grid.Row="3"
                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                   Appearance="Success"
+                   Appearance="Primary"
                    Command="{Binding ConvertCommand}"
                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
 
-        <ui:Button x:Name="SelectFileButton" Content="Select File" FontSize="14"
-                   Width="120" Margin="0,0,152,24" Grid.Row="3"
+        <ui:Button x:Name="SelectFileButton" Icon="{ui:SymbolIcon AddSquareMultiple16}" Content="Select File" FontSize="14"
+                   Width="160" Margin="0,0,156,24" Grid.Row="3"
                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                   Appearance="Primary"
                    Command="{Binding AddFileCommand}" />
 
-        <ui:Button x:Name="SelectFolderButton" Content="Select Folder" FontSize="14"
-                    Width="120" Margin="0,0,280,24" Grid.Row="3"
+        <ui:Button x:Name="SelectFolderButton" Icon="{ui:SymbolIcon FolderAdd16}" Content="Select Folder" FontSize="14"
+                    Width="160" Margin="0,0,328,24" Grid.Row="3"
                    HorizontalAlignment="Right"  VerticalAlignment="Bottom"
-                   Appearance="Primary"
                    Command="{Binding AddFolderCommand}" />
 
-        <ui:Button x:Name="ClearButton" Content="Clear" FontSize="14"
+        <ui:Button x:Name="ClearButton" Icon="{ui:SymbolIcon Delete16}" Content="Clear" FontSize="14"
                    Width="120" Margin="24,0,0,24" Grid.Row="3"
                    HorizontalAlignment="Left" VerticalAlignment="Bottom"
                    Appearance="Danger"

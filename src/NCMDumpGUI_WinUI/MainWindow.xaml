@@ -9,10 +9,11 @@
     xmlns:animations="using:CommunityToolkit.WinUI.Animations"
     xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:myconverters="using:NCMDumpGUI_WinUI.Converter"
     xmlns:models="using:NCMDumpGUI_WinUI.Models"
     mc:Ignorable="d"
     Closed="Window_Closed"
-    Title ="NCMDump GUI">
+    Title ="{Binding Source={StaticResource AppTitle}}">
 
     <Grid x:Name="RootGrid" RowDefinitions ="48,*,60, 60" VerticalAlignment="Stretch"
             Background="Transparent"
@@ -21,6 +22,7 @@
             DragOver="Window_DragOver">
         <Grid.Resources>
             <converters:BoolNegationConverter x:Key="BoolNegationConverter" />
+            <myconverters:BackdropConverter x:Key="BackdropToStringConverter" />
         </Grid.Resources>
         <Grid x:Name="AppTitleBar" VerticalAlignment="Top" Grid.Row="0">
             <Image Source="/Assets/ncmdump.png"
@@ -31,7 +33,7 @@
 
         <Grid Grid.Row="1"
               CornerRadius ="8"
-              Margin="24,24,24,0"
+              Margin="24,12,24,0"
               ui:UIElementExtensions.ClipToBounds="True">
             <Grid x:Name="DropGrid"
                   Grid.Row="0"
@@ -49,7 +51,6 @@
                 </animations:Implicit.HideAnimations>
                 <FontIcon Glyph="&#xE896;" Margin="0,0,0,0" FontSize="48" />
             </Grid>
-
             <controls:DataGrid x:Name="WorkingList"
                                Grid.Row="0"
                                AutoGenerateColumns="False"
@@ -96,6 +97,20 @@
             </controls:DataGrid>
         </Grid>
 
+        <ComboBox Width="120"
+                    Grid.Row="2"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Left"
+                    Margin="24,0,0,0"
+                    ItemsSource="{Binding BackdropCollection}"
+                    SelectedItem="{Binding SelectedBackdrop,Mode=TwoWay}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Converter={StaticResource BackdropToStringConverter}}" />
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
         <CheckBox x:Name="Check_DeleteNCM"
           IsChecked="{Binding WillDeleteNCM,Mode=TwoWay }"
           Content="Delete .NCM file when done"
@@ -118,7 +133,7 @@
         </Button>
 
         <Button x:Name="SelectFileButton"
-           Width="120" Margin="0,0,152,24" Grid.Row="3"
+           Width="160" Margin="0,0,156,24" Grid.Row="3"
            HorizontalAlignment="Right" VerticalAlignment="Bottom"
            Command="{Binding AddFileCommand}">
             <Button.Content>
@@ -130,7 +145,7 @@
         </Button>
 
         <Button x:Name="SelectFolderButton"
-            Width="120" Margin="0,0,280,24" Grid.Row="3"
+            Width="160" Margin="0,0,328,24" Grid.Row="3"
            HorizontalAlignment="Right" VerticalAlignment="Bottom"
            Command="{Binding AddFolderCommand}">
             <Button.Content>

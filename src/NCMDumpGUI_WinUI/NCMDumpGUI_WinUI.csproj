@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
-    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
     <RootNamespace>NCMDumpGUI_WinUI</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x64</Platforms>
@@ -13,17 +13,18 @@
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
 	<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <PlatformTarget>x64</PlatformTarget>
-    <VersionPrefix>2.2.0</VersionPrefix>
-	<VersionSuffix>WinUI-beta</VersionSuffix>
+    <VersionPrefix>2.3.0</VersionPrefix>
+	<VersionSuffix>WinUI</VersionSuffix>
     <ApplicationIcon>Assets\NCMDump.ico</ApplicationIcon>
-	<Authors>KingsZNHONE@Bilibili</Authors>
 	<NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Helper\**" />
     <EmbeddedResource Remove="Helper\**" />
-    <None Remove="Helper\**" />
     <Page Remove="Helper\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Resources\StringDictionary.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -85,6 +86,11 @@
     <Content Update="Assets\ncmdump.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Resources\StringDictionary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <!-- 
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution 

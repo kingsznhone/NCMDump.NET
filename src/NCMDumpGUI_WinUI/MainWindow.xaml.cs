@@ -1,11 +1,9 @@
 using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
 using NCMDumpGUI_WinUI.ViewModels;
 using System;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.UI.ViewManagement;
@@ -15,24 +13,6 @@ using Windows.UI.ViewManagement;
 
 namespace NCMDumpGUI_WinUI
 {
-    [StructLayout(LayoutKind.Sequential)]
-    public struct tagPOINT
-    {
-        public long x;
-        public long y;
-    }
-
-    // 定义MINMAXINFO结构体
-    [StructLayout(LayoutKind.Sequential)]
-    public struct MINMAXINFO
-    {
-        public tagPOINT ptReserved;
-        public tagPOINT ptMaxSize;
-        public tagPOINT ptMaxPosition;
-        public tagPOINT ptMinTrackSize;
-        public tagPOINT ptMaxTrackSize;
-    }
-
     /// <summary>
     /// An empty window that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -42,22 +22,19 @@ namespace NCMDumpGUI_WinUI
         private DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
         private UISettings theme;
 
-        private DataGridTextColumn column1;
-        private DataGridTextColumn column2;
-
         public MainWindow(MainWindowViewModel _vm)
         {
             VM = _vm;
             SetWindowPosition();
-
-            this.InitializeComponent();
-            this.RootGrid.DataContext = VM;
-            this.SystemBackdrop = new DesktopAcrylicBackdrop();
-            this.ExtendsContentIntoTitleBar = true;
-            this.SetTitleBar(AppTitleBar);
-            var datagrid = WorkingList;
+            SystemBackdrop = VM.SelectedBackdrop;
+            ExtendsContentIntoTitleBar = true;
+            SetTitleBar(AppTitleBar);
             theme = new UISettings();
             theme.ColorValuesChanged += UISettings_ColorValuesChanged;
+
+            this.InitializeComponent();
+            var datagrid = WorkingList;
+            RootGrid.DataContext = VM;
         }
 
         private void SetWindowPosition()
@@ -135,7 +112,7 @@ namespace NCMDumpGUI_WinUI
 
         private void Window_Closed(object sender, WindowEventArgs e)
         {
-            Environment.Exit(0);
+            App.Current.Exit();
         }
     }
 }

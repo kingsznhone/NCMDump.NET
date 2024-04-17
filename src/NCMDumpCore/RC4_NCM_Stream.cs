@@ -47,6 +47,20 @@
             return bytesRead;
         }
 
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+        {
+            innerStream.Seek(offset, SeekOrigin.Current);
+            int bytesRead = await Task.Run(() => Read(buffer));
+            return bytesRead;
+        }
+
+        public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            int bytesRead = innerStream.Read(buffer.Span);
+            await Task.Run(() => rc4.Encrypt(buffer));
+            return bytesRead;
+        }
+
         public override long Seek(long offset, SeekOrigin origin)
         {
             return innerStream.Seek(offset, origin);
@@ -60,9 +74,7 @@
         public override void Write(byte[] buffer, int offset, int count)
         {
             Span<byte> span = buffer[offset..(offset + count)];
-
             int bytesWrite = rc4.Encrypt(ref span);
-
             innerStream.Write(span);
         }
 
@@ -73,6 +85,22 @@
             int bytesWrite = rc4.Encrypt(ref span);
 
             innerStream.Write(buffer);
+        }
+
+        public override async Task WriteAsync(byte[] data, int offset, int count, CancellationToken cancellationToken)
+        {
+            byte[] buffer = data[offset..(offset + count)];
+            byte[] encrypted = await Task.Run(() => rc4.Encrypt(buffer));
+            await innerStream.WriteAsync(encrypted);
+            return;
+        }
+
+        public override async ValueTask WriteAsync(ReadOnlyMemory<byte> data, CancellationToken cancellationToken = default)
+        {
+            byte[] buffer = data.ToArray();
+            await Task.Run(() => rc4.Encrypt(buffer));
+            await innerStream.WriteAsync(buffer);
+            return;
         }
     }
 }
