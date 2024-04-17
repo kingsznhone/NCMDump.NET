@@ -13,7 +13,7 @@
     <SupportedOSPlatformVersion>10.0.19041.0</SupportedOSPlatformVersion>
 	<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <PlatformTarget>x64</PlatformTarget>
-    <VersionPrefix>2.2.0</VersionPrefix>
+    <VersionPrefix>2.3.0</VersionPrefix>
 	<VersionSuffix>WinUI-beta</VersionSuffix>
     <ApplicationIcon>Assets\NCMDump.ico</ApplicationIcon>
 	<Authors>KingsZNHONE@Bilibili</Authors>

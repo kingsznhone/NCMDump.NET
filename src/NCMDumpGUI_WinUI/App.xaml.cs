@@ -43,7 +43,7 @@ namespace NCMDumpGUI_WinUI
 
         private void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<NCMDump>();
+            services.AddSingleton<NCMDumper>();
             services.AddSingleton<MainWindowViewModel>();
             services.AddSingleton<MainWindow>();
         }

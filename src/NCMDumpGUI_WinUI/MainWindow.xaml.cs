@@ -15,23 +15,6 @@ using Windows.UI.ViewManagement;
 
 namespace NCMDumpGUI_WinUI
 {
-    [StructLayout(LayoutKind.Sequential)]
-    public struct tagPOINT
-    {
-        public long x;
-        public long y;
-    }
-
-    // 定义MINMAXINFO结构体
-    [StructLayout(LayoutKind.Sequential)]
-    public struct MINMAXINFO
-    {
-        public tagPOINT ptReserved;
-        public tagPOINT ptMaxSize;
-        public tagPOINT ptMaxPosition;
-        public tagPOINT ptMinTrackSize;
-        public tagPOINT ptMaxTrackSize;
-    }
 
     /// <summary>
     /// An empty window that can be used on its own or navigated to within a Frame.

@@ -19,7 +19,7 @@ namespace NCMDumpGUI_WinUI.ViewModels
 {
     public partial class MainWindowViewModel : ObservableObject
     {
-        private readonly NCMDump Core;
+        private readonly NCMDumper Core;
         private DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
 
         private bool _isBusy = false;
@@ -68,7 +68,7 @@ namespace NCMDumpGUI_WinUI.ViewModels
 
         public ObservableCollection<NCMProcessStatus> NCMCollection { get; set; }
 
-        public MainWindowViewModel(NCMDump _core)
+        public MainWindowViewModel(NCMDumper _core)
         {
             Core = _core;
             WillDeleteNCM = true;
