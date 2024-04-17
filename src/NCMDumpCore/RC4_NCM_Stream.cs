@@ -1,8 +1,4 @@
-﻿
-using System;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace NCMDumpCore
+﻿namespace NCMDumpCore
 {
     internal class RC4_NCM_Stream : Stream
     {
@@ -54,17 +50,16 @@ namespace NCMDumpCore
         public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             innerStream.Seek(offset, SeekOrigin.Current);
-            int bytesRead =await Task.Run(()=> Read(buffer));
+            int bytesRead = await Task.Run(() => Read(buffer));
             return bytesRead;
         }
 
         public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
         {
             int bytesRead = innerStream.Read(buffer.Span);
-            await Task.Run(()=> rc4.Encrypt(buffer)); 
+            await Task.Run(() => rc4.Encrypt(buffer));
             return bytesRead;
         }
-
 
         public override long Seek(long offset, SeekOrigin origin)
         {
@@ -107,6 +102,5 @@ namespace NCMDumpCore
             await innerStream.WriteAsync(buffer);
             return;
         }
-
     }
 }

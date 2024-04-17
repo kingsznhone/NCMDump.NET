@@ -1,11 +1,5 @@
-﻿
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
-using System.Linq;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
 using Wpf.Ui.Controls;
 
@@ -13,7 +7,6 @@ namespace NCMDumpGUI.Converter
 {
     public class BackdropConverter : IValueConverter
     {
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is WindowBackdropType.Auto)

@@ -31,7 +31,7 @@ namespace NCMDumpCore
 
             //read raw keybox data
             Span<byte> buffer = stackalloc byte[(int)KeyboxLength];
-            ref byte ref_b = ref MemoryMarshal.GetReference(buffer);
+            ref byte ref_buffer = ref MemoryMarshal.GetReference(buffer);
             ms.Read(buffer);
 
             //SIMD XOR 0x64
@@ -39,9 +39,9 @@ namespace NCMDumpCore
             int i;
             for (i = 0; i <= buffer.Length - vectorSize; i += vectorSize)
             {
-                var vb = Vector256.LoadUnsafe(ref ref_b, (nuint)i);
+                var vb = Vector256.LoadUnsafe(ref ref_buffer, (nuint)i);
                 vb ^= xor;
-                Vector256.StoreUnsafe(vb, ref ref_b, (nuint)i);
+                Vector256.StoreUnsafe(vb, ref ref_buffer, (nuint)i);
             }
             for (; i < buffer.Length; i++)
             {
@@ -95,7 +95,7 @@ namespace NCMDumpCore
             using (RC4_NCM_Stream rc4s = new RC4_NCM_Stream(ms, Key))
             {
                 byte[] data = new byte[ms.Length - ms.Position];
-                Memory<byte> m_data = new Memory<byte> (data);
+                Memory<byte> m_data = new Memory<byte>(data);
                 await rc4s.ReadAsync(m_data);
                 return data;
             }

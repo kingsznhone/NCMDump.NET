@@ -13,7 +13,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Input;
 
 namespace NCMDumpGUI_WinUI.ViewModels
 {
@@ -66,7 +65,7 @@ namespace NCMDumpGUI_WinUI.ViewModels
             }
         }
 
-        public ObservableCollection<SystemBackdrop> BackdropCollection{ get; set; }
+        public ObservableCollection<SystemBackdrop> BackdropCollection { get; set; }
 
         private SystemBackdrop _selectedBackdrop;
 
@@ -94,14 +93,14 @@ namespace NCMDumpGUI_WinUI.ViewModels
             NCMCollection = new ObservableCollection<NCMProcessStatus>();
             AddFolderCommand = new AsyncRelayCommand(FolderDialog);
             AddFileCommand = new AsyncRelayCommand(FileDialog);
-            ClearCommand = new AsyncRelayCommand(ClearList,() => NCMCollection.Count > 0);
+            ClearCommand = new AsyncRelayCommand(ClearList, () => NCMCollection.Count > 0);
             ConvertCommand = new AsyncRelayCommand(StartConvert, () => NCMCollection.Count > 0);
 
             BackdropCollection = [new MicaBackdrop(), new DesktopAcrylicBackdrop()];
 
             if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000, 0))
             {
-               SelectedBackdrop = BackdropCollection.FirstOrDefault(x=>x is MicaBackdrop);
+                SelectedBackdrop = BackdropCollection.FirstOrDefault(x => x is MicaBackdrop);
             }
             else if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 19041, 0))
             {
@@ -146,7 +145,7 @@ namespace NCMDumpGUI_WinUI.ViewModels
             }
         }
 
-        public IAsyncRelayCommand AddFolderCommand { get;}
+        public IAsyncRelayCommand AddFolderCommand { get; }
         public IAsyncRelayCommand AddFileCommand { get; }
         public IAsyncRelayCommand ClearCommand { get; }
         public IAsyncRelayCommand ConvertCommand { get; }

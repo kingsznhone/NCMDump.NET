@@ -8,8 +8,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
@@ -76,13 +74,13 @@ namespace NCMDumpGUI
             NCMCollection = new();
             AddFolderCommand = new AsyncRelayCommand(FolderDialog);
             AddFileCommand = new AsyncRelayCommand(FileDialog);
-            ClearCommand = new AsyncRelayCommand(ClearList , () => NCMCollection.Count > 0);
+            ClearCommand = new AsyncRelayCommand(ClearList, () => NCMCollection.Count > 0);
             ConvertCommand = new AsyncRelayCommand(StartConvert, () => NCMCollection.Count > 0);
             ThemeCommand = new AsyncRelayCommand(SwitchTheme);
 
             BackdropCollection = [
                 WindowBackdropType.Auto,
-                WindowBackdropType.Mica, 
+                WindowBackdropType.Mica,
                 WindowBackdropType.Acrylic,
                 WindowBackdropType.None,
                 WindowBackdropType.Tabbed

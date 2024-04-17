@@ -1,12 +1,9 @@
 using CommunityToolkit.WinUI.UI.Controls;
-using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
 using NCMDumpGUI_WinUI.ViewModels;
 using System;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage;
 using Windows.UI.ViewManagement;
@@ -16,7 +13,6 @@ using Windows.UI.ViewManagement;
 
 namespace NCMDumpGUI_WinUI
 {
-
     /// <summary>
     /// An empty window that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -28,7 +24,6 @@ namespace NCMDumpGUI_WinUI
 
         public MainWindow(MainWindowViewModel _vm)
         {
-            
             VM = _vm;
             SetWindowPosition();
             SystemBackdrop = VM.SelectedBackdrop;

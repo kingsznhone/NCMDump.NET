@@ -14,7 +14,7 @@ namespace NCMDumpGUI
             VM = _vm;
             DataContext = VM;
             WindowBackdropType = VM.SelectedBackdrop;
-            SystemThemeWatcher.Watch(this,VM.SelectedBackdrop,false);
+            SystemThemeWatcher.Watch(this, VM.SelectedBackdrop, false);
             InitializeComponent();
         }
 

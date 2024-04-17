@@ -2,13 +2,13 @@
 
 public class NCMDumpCLI
 {
-    public static void Main(string[] args)
+    public static void Main(params string[] args)
     {
         NCMDumper Core = new();
 
         if (args.Length == 0)
         {
-            Console.WriteLine("Drag [*.ncm] file on exe to start");
+            Console.WriteLine("Drag [*.ncm] file or directory on exe to start");
         }
         else
         {

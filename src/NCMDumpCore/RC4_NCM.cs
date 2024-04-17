@@ -45,6 +45,7 @@
             }
             return data.Length;
         }
+
         public byte[] Decrypt(byte[] data)
         {
             return Encrypt(data);
