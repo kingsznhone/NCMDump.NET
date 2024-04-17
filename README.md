@@ -30,6 +30,8 @@ Add WinUI 3 Publish.
 
 Async optimize on RC4 Stream
 
+Add linux Support
+
 
 ### v2.2.0 2024.03.24
 
