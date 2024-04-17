@@ -1,4 +1,5 @@
 using CommunityToolkit.WinUI.UI.Controls;
+using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
@@ -25,22 +26,20 @@ namespace NCMDumpGUI_WinUI
         private DispatcherQueue dispatcherQueue = DispatcherQueue.GetForCurrentThread();
         private UISettings theme;
 
-        private DataGridTextColumn column1;
-        private DataGridTextColumn column2;
-
         public MainWindow(MainWindowViewModel _vm)
         {
+            
             VM = _vm;
             SetWindowPosition();
-
-            this.InitializeComponent();
-            this.RootGrid.DataContext = VM;
-            this.SystemBackdrop = new DesktopAcrylicBackdrop();
-            this.ExtendsContentIntoTitleBar = true;
-            this.SetTitleBar(AppTitleBar);
-            var datagrid = WorkingList;
+            SystemBackdrop = VM.SelectedBackdrop;
+            ExtendsContentIntoTitleBar = true;
+            SetTitleBar(AppTitleBar);
             theme = new UISettings();
             theme.ColorValuesChanged += UISettings_ColorValuesChanged;
+
+            this.InitializeComponent();
+            var datagrid = WorkingList;
+            RootGrid.DataContext = VM;
         }
 
         private void SetWindowPosition()
@@ -118,7 +117,7 @@ namespace NCMDumpGUI_WinUI
 
         private void Window_Closed(object sender, WindowEventArgs e)
         {
-            Environment.Exit(0);
+            App.Current.Exit();
         }
     }
 }

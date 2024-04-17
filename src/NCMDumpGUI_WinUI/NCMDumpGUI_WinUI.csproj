@@ -25,6 +25,9 @@
     <None Remove="Helper\**" />
     <Page Remove="Helper\**" />
   </ItemGroup>
+  <ItemGroup>
+    <None Remove="Resources\StringDictionary.xaml" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="Assets\SplashScreen.scale-200.png">
@@ -85,6 +88,11 @@
     <Content Update="Assets\ncmdump.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Resources\StringDictionary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <!-- 
     Defining the "HasPackageAndPublishMenuAddedByProject" property here allows the Solution 

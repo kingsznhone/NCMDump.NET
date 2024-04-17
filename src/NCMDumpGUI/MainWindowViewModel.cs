@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
@@ -50,17 +51,51 @@ namespace NCMDumpGUI
 
         public ObservableCollection<NCMProcessStatus> NCMCollection { get; set; }
 
+        public ObservableCollection<WindowBackdropType> BackdropCollection { get; set; }
+
+        private WindowBackdropType _selectedBackdrop;
+
+        public WindowBackdropType SelectedBackdrop
+        {
+            get { return _selectedBackdrop; }
+            set
+            {
+                SetProperty(ref _selectedBackdrop, value);
+                if ((App.Current as App).MainWindow != null)
+                {
+                    ((App.Current as App).MainWindow as FluentWindow).WindowBackdropType = value;
+                }
+            }
+        }
+
         public MainWindowViewModel(NCMDumper _core)
         {
             Core = _core;
             WillDeleteNCM = true;
             ApplicationTitle = "NCMDump.NET";
             NCMCollection = new();
-            AddFolderCommand = new RelayCommand(FolderDialog);
-            AddFileCommand = new RelayCommand(FileDialog);
-            ClearCommand = new RelayCommand(ClearList);
-            ConvertCommand = new AsyncRelayCommand(StartConvert);
-            ThemeCommand = new RelayCommand(SwitchTheme);
+            AddFolderCommand = new AsyncRelayCommand(FolderDialog);
+            AddFileCommand = new AsyncRelayCommand(FileDialog);
+            ClearCommand = new AsyncRelayCommand(ClearList , () => NCMCollection.Count > 0);
+            ConvertCommand = new AsyncRelayCommand(StartConvert, () => NCMCollection.Count > 0);
+            ThemeCommand = new AsyncRelayCommand(SwitchTheme);
+
+            BackdropCollection = [
+                WindowBackdropType.Auto,
+                WindowBackdropType.Mica, 
+                WindowBackdropType.Acrylic,
+                WindowBackdropType.None,
+                WindowBackdropType.Tabbed
+                ];
+
+            if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000, 0))
+            {
+                SelectedBackdrop = BackdropCollection.FirstOrDefault(x => x is WindowBackdropType.Mica);
+            }
+            else if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 19041, 0))
+            {
+                SelectedBackdrop = BackdropCollection.FirstOrDefault(x => x is WindowBackdropType.Acrylic);
+            }
         }
 
         public void OnDrop(string[] args)
@@ -77,6 +112,8 @@ namespace NCMDumpGUI
                         NCMCollection.Add(new NCMProcessStatus(_path, "Await"));
                 }
             }
+            ConvertCommand.NotifyCanExecuteChanged();
+            ClearCommand.NotifyCanExecuteChanged();
         }
 
         private void WalkThrough(DirectoryInfo dir)
@@ -92,11 +129,11 @@ namespace NCMDumpGUI
             }
         }
 
-        public ICommand AddFolderCommand { get; }
-        public ICommand AddFileCommand { get; }
-        public ICommand ClearCommand { get; }
+        public IAsyncRelayCommand AddFolderCommand { get; }
+        public IAsyncRelayCommand AddFileCommand { get; }
+        public IAsyncRelayCommand ClearCommand { get; }
         public IAsyncRelayCommand ConvertCommand { get; }
-        public ICommand ThemeCommand { get; }
+        public IAsyncRelayCommand ThemeCommand { get; }
 
         private async Task StartConvert()
         {
@@ -139,7 +176,7 @@ namespace NCMDumpGUI
             IsBusy = false;
         }
 
-        private void FolderDialog()
+        private async Task FolderDialog()
         {
             var dialog = new CommonOpenFileDialog
             {
@@ -154,7 +191,7 @@ namespace NCMDumpGUI
             }
         }
 
-        private void FileDialog()
+        private async Task FileDialog()
         {
             Microsoft.Win32.OpenFileDialog ofp = new();
             ofp.Multiselect = true;
@@ -169,7 +206,7 @@ namespace NCMDumpGUI
             }
         }
 
-        private void SwitchTheme()
+        private async Task SwitchTheme()
         {
             var appTheme = ApplicationThemeManager.GetAppTheme();
             ApplicationTheme newTheme = appTheme == ApplicationTheme.Dark ? ApplicationTheme.Light : ApplicationTheme.Dark;
@@ -193,6 +230,11 @@ namespace NCMDumpGUI
             ApplicationThemeManager.Apply(newTheme, backdrop);
         }
 
-        private void ClearList() => NCMCollection.Clear();
+        private async Task ClearList()
+        {
+            NCMCollection.Clear();
+            ConvertCommand.NotifyCanExecuteChanged();
+            ClearCommand.NotifyCanExecuteChanged();
+        }
     }
 }

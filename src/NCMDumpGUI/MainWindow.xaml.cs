@@ -12,23 +12,11 @@ namespace NCMDumpGUI
         public MainWindow(MainWindowViewModel _vm)
         {
             VM = _vm;
-            this.DataContext = VM;
+            DataContext = VM;
+            WindowBackdropType = VM.SelectedBackdrop;
+            SystemThemeWatcher.Watch(this,VM.SelectedBackdrop,false);
             InitializeComponent();
-
-            if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000, 0))
-            {
-                SystemThemeWatcher.Watch(this);
-            }
-            else if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 19041, 0))
-            {
-                Btn_Theme.Visibility = Visibility.Hidden;
-                ApplicationThemeManager.Apply(ApplicationTheme.Light, WindowBackdropType.Acrylic);
-            }
-            else
-            {
-                Btn_Theme.Visibility = Visibility.Hidden;
-                ApplicationThemeManager.Apply(ApplicationTheme.Light, WindowBackdropType.None);
-            }
+            
         }
 
         private void DataGrid_SizeChanged(object sender, SizeChangedEventArgs e)
