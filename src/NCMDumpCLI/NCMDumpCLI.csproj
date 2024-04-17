@@ -11,6 +11,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
 	<Version>2.3.0</Version>
 	<Platforms>x64</Platforms>
+	<PublishAot>False</PublishAot>
   </PropertyGroup>
 
  

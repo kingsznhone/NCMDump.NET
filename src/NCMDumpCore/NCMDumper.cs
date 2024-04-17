@@ -126,7 +126,7 @@ namespace NCMDumpCore
                 }
             }
 
-            //Add more infomation
+            //Add more information
             tagfile.Tag.Title = metainfo.musicName;
             tagfile.Tag.Performers = metainfo.artist.Select(x => x[0]).ToArray();
             tagfile.Tag.Album = metainfo.album;
