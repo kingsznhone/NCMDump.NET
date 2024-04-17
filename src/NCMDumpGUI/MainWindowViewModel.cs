@@ -142,7 +142,7 @@ namespace NCMDumpGUI
             {
                 if (NCMCollection[i].FileStatus != "Success")
                 {
-                   // try
+                    try
                     {
                         if (await Core.ConvertAsync(NCMCollection[i].FilePath))
                         {
@@ -164,10 +164,10 @@ namespace NCMDumpGUI
                             NCMCollection[i].FileStatus = "Failed";
                         }
                     }
-                    //catch
-                    //{
-                    //    NCMCollection[i].FileStatus = "Failed";
-                    //}
+                    catch
+                    {
+                        NCMCollection[i].FileStatus = "Failed";
+                    }
                 }
             });
 

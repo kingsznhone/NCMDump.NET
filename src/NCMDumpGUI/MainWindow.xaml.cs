@@ -16,7 +16,6 @@ namespace NCMDumpGUI
             WindowBackdropType = VM.SelectedBackdrop;
             SystemThemeWatcher.Watch(this,VM.SelectedBackdrop,false);
             InitializeComponent();
-            
         }
 
         private void DataGrid_SizeChanged(object sender, SizeChangedEventArgs e)
