@@ -17,7 +17,7 @@ namespace NCMDumpGUI
     [ObservableObject]
     public partial class MainWindowViewModel
     {
-        private readonly NCMDump Core;
+        private readonly NCMDumper Core;
         private bool _isBusy = false;
 
         public bool IsBusy
@@ -105,7 +105,7 @@ namespace NCMDumpGUI
             {
                 if (NCMCollection[i].FileStatus != "Success")
                 {
-                    try
+                   // try
                     {
                         if (await Core.ConvertAsync(NCMCollection[i].FilePath))
                         {
@@ -127,10 +127,10 @@ namespace NCMDumpGUI
                             NCMCollection[i].FileStatus = "Failed";
                         }
                     }
-                    catch
-                    {
-                        NCMCollection[i].FileStatus = "Failed";
-                    }
+                    //catch
+                    //{
+                    //    NCMCollection[i].FileStatus = "Failed";
+                    //}
                 }
             });
 

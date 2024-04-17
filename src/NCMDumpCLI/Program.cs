@@ -1,5 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
-using NCMDumpCore;
+﻿using NCMDumpCore;
 
 public class NCMDumpCLI
 {

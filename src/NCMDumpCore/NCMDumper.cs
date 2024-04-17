@@ -90,13 +90,13 @@ namespace NCMDumpCore
             }
         }
 
-        private byte[] ReadAudioData(ref MemoryStream ms, byte[] Key)
+        private async Task<byte[]> ReadAudioData(MemoryStream ms, byte[] Key)
         {
             using (RC4_NCM_Stream rc4s = new RC4_NCM_Stream(ms, Key))
             {
                 byte[] data = new byte[ms.Length - ms.Position];
-                Span<byte> buffer = new Span<byte>(data);
-                rc4s.Read(buffer);
+                Memory<byte> m_data = new Memory<byte> (data);
+                await rc4s.ReadAsync(m_data);
                 return data;
             }
         }
@@ -139,15 +139,12 @@ namespace NCMDumpCore
                 Console.WriteLine(response.StatusCode);
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    using (var stream = response.Content.ReadAsStream())
+                    using (var memStream = new MemoryStream())
                     {
-                        using (var memStream = new MemoryStream())
-                        {
-                            stream.CopyTo(memStream);
-                            memStream.Position = 0;
-                            Console.WriteLine("album picture Load OK : remote returned {0}", response.StatusCode);
-                            return memStream.ToArray();
-                        }
+                        response.Content.ReadAsStream().CopyTo(memStream);
+                        memStream.Position = 0;
+                        Console.WriteLine("album picture Load OK : remote returned {0}", response.StatusCode);
+                        return memStream.ToArray();
                     }
                 }
                 else
@@ -201,7 +198,7 @@ namespace NCMDumpCore
             byte[] RC4Key = ReadRC4Key(ref ms);
 
             //Read Meta Info
-            MetaInfo metainfo = await Task.Run(() => ReadMeta(ref ms));
+            MetaInfo metainfo = ReadMeta(ref ms);
 
             //CRC32 Check
             var crc32bytes = new byte[4];
@@ -226,7 +223,7 @@ namespace NCMDumpCore
             }
 
             // Read Audio Data
-            byte[] AudioData = await Task.Run(() => ReadAudioData(ref ms, RC4Key));
+            byte[] AudioData = await ReadAudioData(ms, RC4Key);
 
             //Flush Audio Data to disk drive
             string OutputPath = path.Substring(0, path.LastIndexOf("."));
