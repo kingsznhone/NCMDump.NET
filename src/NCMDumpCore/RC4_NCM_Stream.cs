@@ -1,9 +1,9 @@
 ﻿namespace NCMDumpCore
 {
-    internal class RC4_NCM_Stream : Stream
+    public class RC4_NCM_Stream : Stream
     {
-        private Stream innerStream;
-        private RC4_NCM rc4;
+        private readonly Stream innerStream;
+        private readonly RC4_NCM rc4;
 
         public RC4_NCM_Stream(Stream innerStream, byte[] key)
         {
@@ -73,8 +73,8 @@
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            Span<byte> span = buffer[offset..(offset + count)];
-            int bytesWrite = rc4.Encrypt(ref span);
+            Span<byte> span = buffer.AsSpan(offset, count);
+            rc4.Encrypt(ref span);
             innerStream.Write(span);
         }
 
@@ -82,7 +82,7 @@
         {
             Span<byte> span = new byte[buffer.Length];
             buffer.CopyTo(span);
-            int bytesWrite = rc4.Encrypt(ref span);
+            rc4.Encrypt(ref span);
 
             innerStream.Write(buffer);
         }
@@ -91,7 +91,7 @@
         {
             byte[] buffer = data[offset..(offset + count)];
             byte[] encrypted = await Task.Run(() => rc4.Encrypt(buffer));
-            await innerStream.WriteAsync(encrypted);
+            await innerStream.WriteAsync(encrypted, cancellationToken);
             return;
         }
 
@@ -99,7 +99,7 @@
         {
             byte[] buffer = data.ToArray();
             await Task.Run(() => rc4.Encrypt(buffer));
-            await innerStream.WriteAsync(buffer);
+            await innerStream.WriteAsync(buffer, cancellationToken);
             return;
         }
     }

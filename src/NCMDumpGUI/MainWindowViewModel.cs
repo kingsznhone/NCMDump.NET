@@ -71,7 +71,7 @@ namespace NCMDumpGUI
             Core = _core;
             WillDeleteNCM = true;
             ApplicationTitle = "NCMDump.NET";
-            NCMCollection = new();
+            NCMCollection = [];
             AddFolderCommand = new AsyncRelayCommand(FolderDialog);
             AddFileCommand = new AsyncRelayCommand(FileDialog);
             ClearCommand = new AsyncRelayCommand(ClearList, () => NCMCollection.Count > 0);
@@ -191,9 +191,11 @@ namespace NCMDumpGUI
 
         private async Task FileDialog()
         {
-            Microsoft.Win32.OpenFileDialog ofp = new();
-            ofp.Multiselect = true;
-            ofp.Filter = "NCM File(*.ncm)|*.ncm";
+            Microsoft.Win32.OpenFileDialog ofp = new()
+            {
+                Multiselect = true,
+                Filter = "NCM File(*.ncm)|*.ncm"
+            };
             if (ofp.ShowDialog() == true)
             {
                 foreach (string file in ofp.FileNames)
