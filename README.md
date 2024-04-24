@@ -32,6 +32,7 @@ Async optimize on RC4 Stream
 
 Add linux Support
 
+```./ncmdump <file_or_directory> <file_or_directory> <file_or_directory>...```
 
 ### v2.2.0 2024.03.24
 
