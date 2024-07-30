@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <ApplicationIcon>NCMDump.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+	<Version>2.4.0</Version>	
+	<Platforms>x64</Platforms>
+  </PropertyGroup>
+
+ 
+
+  <ItemGroup>
+    <Content Include="NCMDump.ico" />
+  </ItemGroup>
+
+ 
+
+  <ItemGroup>
+    <ProjectReference Include="..\NCMDump.Core\NCMDump.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="ncmdump.png" />
+  </ItemGroup>
+
+</Project>
