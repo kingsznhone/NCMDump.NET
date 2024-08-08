@@ -11,13 +11,9 @@
 	<Platforms>x64</Platforms>
   </PropertyGroup>
 
- 
-
   <ItemGroup>
     <Content Include="NCMDump.ico" />
   </ItemGroup>
-
- 
 
   <ItemGroup>
     <ProjectReference Include="..\NCMDump.Core\NCMDump.Core.csproj" />
