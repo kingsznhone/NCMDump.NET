@@ -1,5 +1,11 @@
 # Change Log
 
+### v2.5.0 2025.01.01
+
+Upgrade runtime to .NET 9.
+
+Remove WinUI3
+
 ### v2.4.0 2024.7.30
 
 Code Cleaning. bug fix.

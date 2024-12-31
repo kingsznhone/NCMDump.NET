@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "NCMDump.WinUI (Unpackaged)": {
-      "commandName": "Project",
-      "nativeDebugging": false
-    }
-  }
-}

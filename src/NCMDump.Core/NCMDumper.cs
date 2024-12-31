@@ -4,6 +4,7 @@ using System.Runtime.Intrinsics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 using TagLib;
 
 namespace NCMDump.Core
@@ -90,7 +91,7 @@ namespace NCMDump.Core
                 var cleanText = aes.DecryptEcb(buffer, PaddingMode.PKCS7);
                 var MetaJsonString = Encoding.UTF8.GetString(cleanText.AsSpan(6));
                 JsonSerializerOptions option = new JsonSerializerOptions();
-                MetaInfo metainfo = JsonSerializer.Deserialize<MetaInfo>(MetaJsonString);
+                MetaInfo metainfo = JsonSerializer.Deserialize<MetaInfo>(MetaJsonString)!;
                 return metainfo;
             }
         }
