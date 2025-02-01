@@ -18,7 +18,7 @@ Keep ID3 tags and cover image.
 
  ```Windows 10 10.0.19041.0``` & ```.NET8 Desktop Runtime``` (Minimum)
 
-
+Linux with dotnet 9 runtime
 
 ## Usage
 
