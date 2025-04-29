@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
@@ -132,9 +133,11 @@ namespace NCMDump.WPF
             }
         }
 
+        //
         private async Task StartConvert()
         {
             IsBusy = true;
+            var dispatcher = Application.Current.Dispatcher;
             await Parallel.ForAsync(0, NCMCollection.Count, async (i, state) =>
             {
                 if (NCMCollection[i].FileStatus != "Success")
@@ -143,7 +146,7 @@ namespace NCMDump.WPF
                     {
                         if (await Dumper.ConvertAsync(NCMCollection[i].FilePath))
                         {
-                            NCMCollection[i].FileStatus = "Success";
+                            await dispatcher.BeginInvoke(() => NCMCollection[i].FileStatus = "Success");
                             if (WillDeleteNCM)
                             {
                                 try
@@ -158,17 +161,17 @@ namespace NCMDump.WPF
                         }
                         else
                         {
-                            NCMCollection[i].FileStatus = "Failed";
+                            await dispatcher.BeginInvoke(() => NCMCollection[i].FileStatus = "Failed");
                         }
                     }
                     catch
                     {
-                        NCMCollection[i].FileStatus = "Failed";
+                        await dispatcher.BeginInvoke(() => NCMCollection[i].FileStatus = "Failed");
                     }
                 }
             });
 
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive);
             GC.WaitForPendingFinalizers();
             IsBusy = false;
         }

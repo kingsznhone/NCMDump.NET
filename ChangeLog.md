@@ -1,5 +1,9 @@
 # Change Log
 
+### v2.5.1 2025.04.30
+
+Upgrade WPF.UI Package
+
 ### v2.5.0 2025.01.01
 
 Upgrade runtime to .NET 9.

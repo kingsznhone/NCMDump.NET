@@ -53,7 +53,9 @@
 
         <ui:DataGrid x:Name="WorkingList"
                      ItemsSource="{Binding NCMCollection}"
-                     AutoGenerateColumns="False" Grid.Row="1" Margin="24,24,24,0"
+                     AutoGenerateColumns="False" Grid.Row="1" Margin="24,24,24,24"
+                     BorderBrush="#20000000"
+                     BorderThickness="1"
                      IsSynchronizedWithCurrentItem="True"
                      IsReadOnly="True"
                      AllowDrop="True"
@@ -93,8 +95,9 @@
 
         <ComboBox Width="120"
                   MinWidth="120"
+                  Height="36"
             Grid.Row="2"
-            VerticalAlignment="Center"
+            VerticalAlignment="Top"
             HorizontalAlignment="Left"
             Margin="24,0,0,0"
             ItemsSource="{Binding BackdropCollection}"
@@ -107,36 +110,41 @@
         </ComboBox>
 
         <CheckBox x:Name="Check_DeleteNCM"
+                  Height="36"
                   IsChecked="{Binding WillDeleteNCM}"
                   Content="Delete .NCM file when done"
                   Margin="0,0,24,0"
                   Grid.Row="2"
-                  FontSize="14"
-                  VerticalAlignment="Center"
+                  FontSize="12"
+                  VerticalAlignment="Top"
                   HorizontalAlignment="Right" />
 
-        <ui:Button x:Name="StartButton" Icon="{ui:SymbolIcon PlayMultiple16}" Content="Convert" FontSize="14"
-                    Width="120" Margin="0,0,24,24" Grid.Row="3"
+        <ui:Button x:Name="StartButton" Icon="{ui:SymbolIcon PlayMultiple16}" Content="Convert" FontSize="12"
+                   Width="120" Height="36" Margin="0,0,24,24" Grid.Row="3"
                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                   HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                    Appearance="Primary"
                    Command="{Binding ConvertCommand}"
                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
 
-        <ui:Button x:Name="SelectFileButton" Icon="{ui:SymbolIcon AddSquareMultiple16}" Content="Select File" FontSize="14"
-                   Width="160" Margin="0,0,156,24" Grid.Row="3"
+        <ui:Button x:Name="SelectFileButton" Icon="{ui:SymbolIcon AddSquareMultiple16}" Content="Select File" FontSize="12"
+                   Width="150" Height="36" Margin="0,0,156,24" Grid.Row="3"
                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                   HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                    Command="{Binding AddFileCommand}"
                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
 
-        <ui:Button x:Name="SelectFolderButton" Icon="{ui:SymbolIcon FolderAdd16}" Content="Select Folder" FontSize="14"
-                    Width="160" Margin="0,0,328,24" Grid.Row="3"
+        <ui:Button x:Name="SelectFolderButton" Icon="{ui:SymbolIcon FolderAdd16}" Content="Select Folder" FontSize="12"
+                   Width="150" Height="36" Margin="0,0,318,24" Grid.Row="3"
                    HorizontalAlignment="Right"  VerticalAlignment="Bottom"
+                   HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                    Command="{Binding AddFolderCommand}"
                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
 
-        <ui:Button x:Name="ClearButton" Icon="{ui:SymbolIcon Delete16}" Content="Clear" FontSize="14"
-                   Width="120" Margin="24,0,0,24" Grid.Row="3"
+        <ui:Button x:Name="ClearButton" Icon="{ui:SymbolIcon Delete16}" Content="Clear" FontSize="12"
+                   Width="120" Height="36" Margin="24,0,0,24" Grid.Row="3"
                    HorizontalAlignment="Left" VerticalAlignment="Bottom"
+                   HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                    Appearance="Danger"
                    Command="{Binding ClearCommand}"
                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
