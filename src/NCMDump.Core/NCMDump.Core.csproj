@@ -5,7 +5,7 @@
     <TargetFrameworks>net9.0;</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<VersionPrefix>2.5.0</VersionPrefix>
+	<VersionPrefix>2.5.1</VersionPrefix>
     <Platforms>x64</Platforms>
   </PropertyGroup>
 

@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <ApplicationIcon>NCMDump.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-	<Version>2.5.0</Version>	
+	<Version>2.5.1</Version>	
 	<Platforms>x64</Platforms>
   </PropertyGroup>
 

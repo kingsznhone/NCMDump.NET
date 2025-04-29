@@ -1,4 +1,5 @@
-﻿using NCMDump.Core;
+﻿using System.Reflection;
+using NCMDump.Core;
 
 namespace NCMDump.CLI
 {
@@ -8,13 +9,18 @@ namespace NCMDump.CLI
 
         public static void Main(params string[] args)
         {
+            var version = Assembly.GetEntryAssembly()?.GetName().Version;
             int depth = 0;
             if (args.Length == 0)
             {
+                Console.WriteLine("==============================");
+                Console.WriteLine($"NCMDump CLI - Version {version}");
+                Console.WriteLine("==============================");
+                Console.WriteLine("");
                 if (OperatingSystem.IsWindows())
                 {
-                    Console.WriteLine("Drag [*.ncm] file or directory on exe to start...");
                     Console.WriteLine("./ncmdump.exe <file_or_dir1> [<file_or_dir2> ... <file_or_dirN>]");
+                    Console.WriteLine("Or drag [*.ncm] file or directory on exe to start...");
                 }
                 if (OperatingSystem.IsLinux())
                 {
