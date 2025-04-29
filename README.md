@@ -10,7 +10,7 @@ Keep ID3 tags and cover image.
 
 <img src="./README/Result.png"/>
 
-### [Change Log](./Changelog.MD)
+### [Change Log](./ChangeLog.md)
 
 ## System Requirement
 
