@@ -1,11 +1,11 @@
 ﻿namespace NCMDump.Core
 {
-    public class RC4_NCM
+    public class NcmRC4
     {
         private readonly byte[] Keybox;
         private int i = 0, j = 0;
 
-        public RC4_NCM(byte[] key)
+        public NcmRC4(byte[] key)
         {
             Keybox = Enumerable.Range(0, 256).Select(i => (byte)i).ToArray();
 
@@ -17,13 +17,13 @@
             }
         }
 
-        public byte[] Encrypt(byte[] data)
+        public byte[] Transform(byte[] data)
         {
-            Encrypt(data.AsSpan());
+            Transform(data.AsSpan());
             return data;
         }
 
-        public int Encrypt(Span<byte> data)
+        public int Transform(Span<byte> data)
         {
             for (int m = 0; m < data.Length; m++)
             {
@@ -34,24 +34,9 @@
             return data.Length;
         }
 
-        public int Encrypt(Memory<byte> data)
+        public int Transform(Memory<byte> data)
         {
-            return Encrypt(data.Span);
-        }
-
-        public byte[] Decrypt(byte[] data)
-        {
-            return Encrypt(data);
-        }
-
-        public int Decrypt(Span<byte> data)
-        {
-            return Encrypt(data);
-        }
-
-        public int Decrypt(Memory<byte> data)
-        {
-            return Encrypt(data);
+            return Transform(data.Span);
         }
     }
 }

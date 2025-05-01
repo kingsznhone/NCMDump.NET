@@ -26,7 +26,7 @@ namespace NCMDump.WPF
             grid.Columns[1].Width = 120;
         }
 
-        private void WorkingList_Drop(object sender, System.Windows.DragEventArgs e)
+        private void WorkingList_Drop(object sender, DragEventArgs e)
         {
             string[] args = (string[])e.Data.GetData(DataFormats.FileDrop);
 
@@ -36,7 +36,7 @@ namespace NCMDump.WPF
             }
         }
 
-        private void Window_Closed(object sender, System.EventArgs e)
+        private void Window_Closed(object sender, EventArgs e)
         {
             Environment.Exit(0);
         }

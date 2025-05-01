@@ -6,11 +6,12 @@ namespace NCMDump.CLI
     public class Application
     {
         public static NCMDumper Dumper = new();
+        public static int DirDepth = 0;
 
         public static void Main(params string[] args)
         {
             var version = Assembly.GetEntryAssembly()?.GetName().Version;
-            int depth = 0;
+
             if (args.Length == 0)
             {
                 Console.WriteLine("==============================");
@@ -57,10 +58,10 @@ namespace NCMDump.CLI
 
             void WalkThrough(DirectoryInfo dir)
             {
-                depth++;
-                if (depth > 16)
+                DirDepth++;
+                if (DirDepth > 16)
                 {
-                    depth--;
+                    DirDepth--;
                     return;
                 }
                 Console.WriteLine("DIR: " + dir.FullName);
@@ -76,7 +77,7 @@ namespace NCMDump.CLI
                 }
 
                 Console.WriteLine();
-                depth--;
+                DirDepth--;
             }
         }
     }

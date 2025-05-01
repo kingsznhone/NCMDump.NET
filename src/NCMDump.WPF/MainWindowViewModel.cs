@@ -17,48 +17,34 @@ namespace NCMDump.WPF
     public partial class MainWindowViewModel : ObservableObject
     {
         private readonly NCMDumper Dumper;
-        private bool _isBusy = false;
 
         public bool IsBusy
         {
-            get
-            {
-                return _isBusy;
-            }
-            set
-            {
-                SetProperty(ref _isBusy, value);
-            }
+            get => field;
+            set => SetProperty(ref field, value);
         }
-
-        private bool _willDeleteNCM;
 
         public bool WillDeleteNCM
         {
-            get => _willDeleteNCM;
-            set => SetProperty(ref _willDeleteNCM, value);
+            get => field;
+            set => SetProperty(ref field, value);
         }
-
-        private string _applicationTitle;
 
         public string ApplicationTitle
         {
-            get => _applicationTitle;
-            set => SetProperty(ref _applicationTitle, value);
+            get => field;
+            set => SetProperty(ref field, value);
         }
 
-        public ObservableCollection<NCMProcessStatus> NCMCollection { get; set; }
-
+        public ObservableCollection<NCMConvertMissionStatus> NCMCollection { get; set; }
         public ObservableCollection<WindowBackdropType> BackdropCollection { get; set; }
-
-        private WindowBackdropType _selectedBackdrop;
 
         public WindowBackdropType SelectedBackdrop
         {
-            get { return _selectedBackdrop; }
+            get => field;
             set
             {
-                SetProperty(ref _selectedBackdrop, value);
+                SetProperty(ref field, value);
                 if ((App.Current as App).MainWindow != null)
                 {
                     ((App.Current as App).MainWindow as FluentWindow).WindowBackdropType = value;
@@ -113,7 +99,7 @@ namespace NCMDump.WPF
                 else if (new FileInfo(path).Exists)
                 {
                     if (path.EndsWith(@".ncm") && !NCMCollection.Any(x => x.FilePath == path))
-                        NCMCollection.Add(new NCMProcessStatus(path, "Await"));
+                        NCMCollection.Add(new NCMConvertMissionStatus(path, "Await"));
                 }
             }
             ConvertCommand.NotifyCanExecuteChanged();
@@ -129,11 +115,10 @@ namespace NCMDump.WPF
             foreach (FileInfo f in dir.EnumerateFiles())
             {
                 if (f.FullName.EndsWith(@".ncm") && !NCMCollection.Any(x => x.FilePath == f.FullName))
-                    NCMCollection.Add(new NCMProcessStatus(f.FullName, "Await"));
+                    NCMCollection.Add(new NCMConvertMissionStatus(f.FullName, "Await"));
             }
         }
 
-        //
         private async Task StartConvert()
         {
             IsBusy = true;
@@ -170,7 +155,6 @@ namespace NCMDump.WPF
                     }
                 }
             });
-
             GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive);
             GC.WaitForPendingFinalizers();
             IsBusy = false;

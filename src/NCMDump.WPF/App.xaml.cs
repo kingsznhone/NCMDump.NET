@@ -11,7 +11,7 @@ namespace NCMDump.WPF
     public partial class App : Application
     {
         private IServiceProvider _serviceProvider;
-        private ObservableCollection<NCMProcessStatus> NCMCollection = new();
+        private ObservableCollection<NCMConvertMissionStatus> NCMCollection = new();
         private int depth;
 
         protected override void OnStartup(StartupEventArgs e)
@@ -59,7 +59,7 @@ namespace NCMDump.WPF
                 else if (new FileInfo(_path).Exists)
                 {
                     if (_path.EndsWith(@".ncm") && !NCMCollection.Any(x => x.FilePath == _path))
-                        NCMCollection.Add(new NCMProcessStatus(_path, "Await"));
+                        NCMCollection.Add(new NCMConvertMissionStatus(_path, "Await"));
                 }
             }
         }
@@ -79,7 +79,7 @@ namespace NCMDump.WPF
             foreach (FileInfo f in dir.EnumerateFiles())
             {
                 if (f.FullName.EndsWith(@".ncm") && !NCMCollection.Any(x => x.FilePath == f.FullName))
-                    NCMCollection.Add(new NCMProcessStatus(f.FullName, "Await"));
+                    NCMCollection.Add(new NCMConvertMissionStatus(f.FullName, "Await"));
             }
             depth--;
         }

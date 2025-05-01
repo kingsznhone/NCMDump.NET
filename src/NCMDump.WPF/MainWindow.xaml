@@ -109,7 +109,7 @@
             </ComboBox.ItemTemplate>
         </ComboBox>
 
-        <CheckBox x:Name="Check_DeleteNCM"
+        <ui:ToggleSwitch x:Name="Check_DeleteNCM"
                   Height="36"
                   IsChecked="{Binding WillDeleteNCM}"
                   Content="Delete .NCM file when done"

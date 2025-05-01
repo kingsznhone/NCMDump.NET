@@ -4,7 +4,6 @@ using System.Runtime.Intrinsics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization.Metadata;
 using TagLib;
 
 namespace NCMDump.Core
@@ -90,20 +89,23 @@ namespace NCMDump.Core
                 aes.Key = metaKey;
                 var cleanText = aes.DecryptEcb(buffer, PaddingMode.PKCS7);
                 var MetaJsonString = Encoding.UTF8.GetString(cleanText.AsSpan(6));
-                JsonSerializerOptions option = new JsonSerializerOptions();
-                MetaInfo metainfo = JsonSerializer.Deserialize<MetaInfo>(MetaJsonString)!;
+                JsonSerializerOptions option = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase  // 自动将大驼峰属性名匹配到小驼峰JSON键
+                };
+                MetaInfo metainfo = JsonSerializer.Deserialize<MetaInfo>(MetaJsonString, option)!;
                 return metainfo;
             }
         }
 
         private async Task<byte[]> ReadAudioData(MemoryStream ms, byte[] Key)
         {
-            using (IRC4_NCM_Stream rc4s = new RC4_NCM_Stream(ms, Key))
+            using (IRC4_NCM_Stream rc4s = new NcmRC4Stream(ms, Key))
             {
-                byte[] data = new byte[ms.Length - ms.Position];
-                Memory<byte> m_data = new(data);
-                await rc4s.ReadAsync(m_data);
-                return data;
+                byte[] AudioData = new byte[ms.Length - ms.Position];
+                Memory<byte> AudioDataView = new(AudioData);
+                await rc4s.ReadAsync(AudioDataView);
+                return AudioData;
             }
         }
 
@@ -118,9 +120,9 @@ namespace NCMDump.Core
                 tagfile.Tag.Pictures = [PicEmbedded];
             }
             //Use Internet Picture
-            else if (metainfo.albumPic != "")
+            else if (metainfo.AlbumPic != "")
             {
-                byte[]? NetImgData = await FetchUrl(new Uri(metainfo.albumPic));
+                byte[]? NetImgData = await FetchUrl(new Uri(metainfo.AlbumPic));
                 if (NetImgData is not null)
                 {
                     var PicFromNet = new Picture(new ByteVector(NetImgData));
@@ -129,10 +131,10 @@ namespace NCMDump.Core
             }
 
             //Add more information
-            tagfile.Tag.Title = metainfo.musicName;
-            tagfile.Tag.Performers = metainfo.artist.Select(x => x[0]).ToArray();
-            tagfile.Tag.Album = metainfo.album;
-            tagfile.Tag.Subtitle = string.Join(@";", metainfo.alias);
+            tagfile.Tag.Title = metainfo.MusicName;
+            tagfile.Tag.Performers = metainfo.Artist.Select(x => x[0]).ToArray();
+            tagfile.Tag.Album = metainfo.Album;
+            tagfile.Tag.Subtitle = string.Join(@";", metainfo.Alias);
             tagfile.Save();
         }
 
@@ -232,7 +234,7 @@ namespace NCMDump.Core
             //Flush Audio Data to disk drive
             string OutputPath = path[..path.LastIndexOf('.')];
 
-            string format = metainfo.format ?? "mp3";
+            string format = metainfo.Format ?? "mp3";
             await System.IO.File.WriteAllBytesAsync($"{OutputPath}.{format}", AudioData);
 
             //Add tag and cover
