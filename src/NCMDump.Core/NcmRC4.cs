@@ -2,18 +2,18 @@
 {
     public class NcmRC4
     {
-        private readonly byte[] Keybox;
-        private int i = 0, j = 0;
+        private readonly byte[] Sbox;
+        private byte i = 0, j = 0, Si = 0, Sj = 0;
 
         public NcmRC4(byte[] key)
         {
-            Keybox = Enumerable.Range(0, 256).Select(i => (byte)i).ToArray();
+            Sbox = Enumerable.Range(0, 256).Select(i => (byte)i).ToArray();
 
             //Generate Keybox
             for (int x = 0, y = 0; x < 256; x++)
             {
-                y = (y + Keybox[x] + key[x % key.Length]) & 0xFF;
-                (Keybox[x], Keybox[y]) = (Keybox[y], Keybox[x]);
+                y = (y + Sbox[x] + key[x % key.Length]) & 0xFF;
+                (Sbox[x], Sbox[y]) = (Sbox[y], Sbox[x]);
             }
         }
 
@@ -27,9 +27,12 @@
         {
             for (int m = 0; m < data.Length; m++)
             {
-                i = (i + 1) & 0xFF;
-                j = (i + Keybox[i]) & 0xFF;
-                data[m] ^= Keybox[(Keybox[i] + Keybox[j]) & 0xFF];
+                i = (byte)(i + 1);
+                Si = Sbox[i];
+                j = (byte)(i + Si);
+                Sj = Sbox[j];
+
+                data[m] ^= Sbox[(byte)(Si + Sj)];
             }
             return data.Length;
         }

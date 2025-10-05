@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NCMDump.Core;
+using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
-using Microsoft.Extensions.DependencyInjection;
-using NCMDump.Core;
 
 namespace NCMDump.WPF
 {
@@ -36,6 +36,7 @@ namespace NCMDump.WPF
             services.AddSingleton<NCMDumper>();
             services.AddSingleton<MainWindowViewModel>();
             services.AddSingleton<MainWindow>();
+            services.AddSingleton<IUiThreadDispatcher>(_ => new WpfUiThreadDispatcher(Current.Dispatcher));
         }
 
         protected override void OnExit(ExitEventArgs e)

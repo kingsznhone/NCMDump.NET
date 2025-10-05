@@ -4,11 +4,23 @@
     {
         private readonly Stream _innerStream;
         private readonly NcmRC4 _rc4;
+        private readonly NcmRC4Native _rc4Native;
 
         public NcmRC4Stream(Stream innerStream, byte[] key)
         {
             _innerStream = innerStream;
-            _rc4 = new NcmRC4(key);
+            if (OperatingSystem.IsOSPlatform("Windows"))
+            {
+                _rc4 = null!;
+                _rc4Native = new NcmRC4Native(key);
+                return;
+            }
+            else
+            {
+                _rc4Native = null!;
+                _rc4 = new NcmRC4(key);
+                return;
+            }
         }
 
         public override bool CanRead => _innerStream.CanRead;
@@ -51,7 +63,14 @@
 
             if (bytesRead > 0)
             {
-                await Task.Run(() => _rc4.Transform(buffer[..bytesRead]), cancellationToken).ConfigureAwait(false);
+                if (OperatingSystem.IsOSPlatform("Windows"))
+                {
+                    await Task.Run(() => _rc4Native.Transform(buffer.Span[..bytesRead]), cancellationToken).ConfigureAwait(false);
+                }
+                else
+                {
+                    await Task.Run(() => _rc4.Transform(buffer[..bytesRead]), cancellationToken).ConfigureAwait(false);
+                }
             }
             return bytesRead;
         }

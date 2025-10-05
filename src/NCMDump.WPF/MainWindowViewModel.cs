@@ -1,40 +1,35 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
+using NCMDump.Core;
+using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using Microsoft.Win32;
-using NCMDump.Core;
-using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
 namespace NCMDump.WPF
 {
     public partial class MainWindowViewModel : ObservableObject
     {
-        private readonly NCMDumper Dumper;
+        private readonly NCMDumper _dumper;
+        private readonly IUiThreadDispatcher _dispatcher;
 
-        public bool IsBusy
-        {
-            get => field;
-            set => SetProperty(ref field, value);
-        }
+        private bool ClearListCanExecute() => NCMCollection.Count > 0 && !IsBusy;
 
-        public bool WillDeleteNCM
-        {
-            get => field;
-            set => SetProperty(ref field, value);
-        }
+        private bool StartConvertCanExecute() => NCMCollection.Count > 0 && !IsBusy;
 
-        public string ApplicationTitle
-        {
-            get => field;
-            set => SetProperty(ref field, value);
-        }
+        [ObservableProperty]
+        public partial bool IsBusy { get; set; }
+
+        [ObservableProperty]
+        public partial bool WillDeleteNCM { get; set; }
+
+        [ObservableProperty]
+        public partial string ApplicationTitle { get; set; }
 
         public ObservableCollection<NCMConvertMissionStatus> NCMCollection { get; set; }
         public ObservableCollection<WindowBackdropType> BackdropCollection { get; set; }
@@ -45,31 +40,25 @@ namespace NCMDump.WPF
             set
             {
                 SetProperty(ref field, value);
-                if ((App.Current as App).MainWindow != null)
+                if (Application.Current.MainWindow != null)
                 {
-                    ((App.Current as App).MainWindow as FluentWindow).WindowBackdropType = value;
+                    (Application.Current.MainWindow as FluentWindow)!.WindowBackdropType = value;
                 }
             }
         }
 
-        public IAsyncRelayCommand AddFolderCommand { get; }
-        public IAsyncRelayCommand AddFileCommand { get; }
-        public IAsyncRelayCommand ClearCommand { get; }
-        public IAsyncRelayCommand ConvertCommand { get; }
-        public IAsyncRelayCommand ThemeCommand { get; }
-
-        public MainWindowViewModel(NCMDumper _core)
+        public MainWindowViewModel(NCMDumper dumper, IUiThreadDispatcher dispatcher)
         {
-            Dumper = _core;
+            _dumper = dumper;
+            _dispatcher = dispatcher;
             WillDeleteNCM = true;
             ApplicationTitle = "NCMDump.NET";
             NCMCollection = [];
-            AddFolderCommand = new AsyncRelayCommand(OpenSelectFolderDialog);
-            AddFileCommand = new AsyncRelayCommand(OpenSelectFileDialog);
-            ClearCommand = new AsyncRelayCommand(ClearList, () => NCMCollection.Count > 0);
-            ConvertCommand = new AsyncRelayCommand(StartConvert, () => NCMCollection.Count > 0);
-            ThemeCommand = new AsyncRelayCommand(SwitchTheme);
-
+            NCMCollection.CollectionChanged += (_, _) =>
+            {
+                ClearListCommand.NotifyCanExecuteChanged();
+                StartConvertCommand.NotifyCanExecuteChanged();
+            };
             BackdropCollection = [
                 WindowBackdropType.Auto,
                 WindowBackdropType.Mica,
@@ -80,11 +69,15 @@ namespace NCMDump.WPF
 
             if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000, 0))
             {
-                SelectedBackdrop = BackdropCollection.FirstOrDefault(x => x is WindowBackdropType.Mica);
+                SelectedBackdrop = WindowBackdropType.Mica;
             }
             else if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 19041, 0))
             {
-                SelectedBackdrop = BackdropCollection.FirstOrDefault(x => x is WindowBackdropType.Acrylic);
+                SelectedBackdrop = WindowBackdropType.Acrylic;
+            }
+            else
+            {
+                SelectedBackdrop = WindowBackdropType.Auto;
             }
         }
 
@@ -102,8 +95,6 @@ namespace NCMDump.WPF
                         NCMCollection.Add(new NCMConvertMissionStatus(path, "Await"));
                 }
             }
-            ConvertCommand.NotifyCanExecuteChanged();
-            ClearCommand.NotifyCanExecuteChanged();
         }
 
         private void WalkThrough(DirectoryInfo dir)
@@ -119,19 +110,19 @@ namespace NCMDump.WPF
             }
         }
 
+        [RelayCommand(CanExecute = nameof(StartConvertCanExecute))]
         private async Task StartConvert()
         {
             IsBusy = true;
-            var dispatcher = Application.Current.Dispatcher;
             await Parallel.ForAsync(0, NCMCollection.Count, async (i, state) =>
             {
                 if (NCMCollection[i].FileStatus != "Success")
                 {
                     try
                     {
-                        if (await Dumper.ConvertAsync(NCMCollection[i].FilePath))
+                        if (await _dumper.ConvertAsync(NCMCollection[i].FilePath))
                         {
-                            await dispatcher.BeginInvoke(() => NCMCollection[i].FileStatus = "Success");
+                            await _dispatcher.InvokeAsync(() => NCMCollection[i].FileStatus = "Success");
                             if (WillDeleteNCM)
                             {
                                 try
@@ -146,12 +137,12 @@ namespace NCMDump.WPF
                         }
                         else
                         {
-                            await dispatcher.BeginInvoke(() => NCMCollection[i].FileStatus = "Failed");
+                            await _dispatcher.InvokeAsync(() => NCMCollection[i].FileStatus = "Failed");
                         }
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        await dispatcher.BeginInvoke(() => NCMCollection[i].FileStatus = "Failed");
+                        await _dispatcher.InvokeAsync(() => NCMCollection[i].FileStatus = "Failed");
                     }
                 }
             });
@@ -160,7 +151,8 @@ namespace NCMDump.WPF
             IsBusy = false;
         }
 
-        private async Task OpenSelectFolderDialog()
+        [RelayCommand]
+        private void SelectFolder()
         {
             OpenFolderDialog ofp = new OpenFolderDialog
             {
@@ -173,7 +165,8 @@ namespace NCMDump.WPF
             }
         }
 
-        private async Task OpenSelectFileDialog()
+        [RelayCommand]
+        private void SelectFile()
         {
             OpenFileDialog ofp = new OpenFileDialog
             {
@@ -186,35 +179,7 @@ namespace NCMDump.WPF
             }
         }
 
-        private async Task SwitchTheme()
-        {
-            var appTheme = ApplicationThemeManager.GetAppTheme();
-            ApplicationTheme newTheme = appTheme == ApplicationTheme.Dark ? ApplicationTheme.Light : ApplicationTheme.Dark;
-
-            WindowBackdropType backdrop = WindowBackdropType.Acrylic;
-            if (newTheme == ApplicationTheme.Dark)
-            {
-                if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000, 0))
-                {
-                    backdrop = WindowBackdropType.Mica;
-                }
-                else if (OperatingSystem.IsWindowsVersionAtLeast(10, 0, 19041, 0))
-                {
-                    backdrop = WindowBackdropType.Acrylic;
-                }
-                else
-                {
-                    backdrop = WindowBackdropType.None;
-                }
-            }
-            ApplicationThemeManager.Apply(newTheme, backdrop);
-        }
-
-        private async Task ClearList()
-        {
-            NCMCollection.Clear();
-            ConvertCommand.NotifyCanExecuteChanged();
-            ClearCommand.NotifyCanExecuteChanged();
-        }
+        [RelayCommand(CanExecute = nameof(ClearListCanExecute))]
+        private void ClearList() => NCMCollection.Clear();
     }
 }
