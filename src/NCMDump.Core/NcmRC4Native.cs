@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace NCMDump.Core
 {
-    public sealed partial class NcmRC4Native : IDisposable
+    public sealed partial class NcmRC4Native : IDisposable, IRC4Transformer
     {
         private const string DllName = "Resources/RC4Transformer";
         private RC4TransformerSafeHandle _transformerHandle;

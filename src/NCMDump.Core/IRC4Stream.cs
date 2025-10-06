@@ -1,6 +1,6 @@
 ﻿namespace NCMDump.Core
 {
-    public interface IRC4_NCM_Stream : IDisposable
+    public interface IRC4Stream : IDisposable
     {
         public bool CanRead { get; }
         public bool CanSeek { get; }

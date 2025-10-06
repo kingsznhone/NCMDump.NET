@@ -1,6 +1,6 @@
 ﻿namespace NCMDump.Core
 {
-    public class NcmRC4
+    public sealed class NcmRC4: IRC4Transformer
     {
         private readonly byte[] Sbox;
         private byte i = 0, j = 0, Si = 0, Sj = 0;

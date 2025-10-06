@@ -1,23 +1,20 @@
 ﻿namespace NCMDump.Core
 {
-    public class NcmRC4Stream : Stream, IRC4_NCM_Stream
+    public class NcmRC4Stream : Stream, IRC4Stream
     {
         private readonly Stream _innerStream;
-        private readonly NcmRC4 _rc4;
-        private readonly NcmRC4Native _rc4Native;
+        private readonly IRC4Transformer _rc4;
 
         public NcmRC4Stream(Stream innerStream, byte[] key)
         {
             _innerStream = innerStream;
             if (OperatingSystem.IsOSPlatform("Windows"))
             {
-                _rc4 = null!;
-                _rc4Native = new NcmRC4Native(key);
+                _rc4 = new NcmRC4Native(key);
                 return;
             }
             else
             {
-                _rc4Native = null!;
                 _rc4 = new NcmRC4(key);
                 return;
             }
@@ -63,14 +60,7 @@
 
             if (bytesRead > 0)
             {
-                if (OperatingSystem.IsOSPlatform("Windows"))
-                {
-                    await Task.Run(() => _rc4Native.Transform(buffer.Span[..bytesRead]), cancellationToken).ConfigureAwait(false);
-                }
-                else
-                {
-                    await Task.Run(() => _rc4.Transform(buffer[..bytesRead]), cancellationToken).ConfigureAwait(false);
-                }
+                await Task.Run(() => _rc4.Transform(buffer[..bytesRead]), cancellationToken).ConfigureAwait(false);
             }
             return bytesRead;
         }
