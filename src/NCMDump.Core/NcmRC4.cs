@@ -23,17 +23,23 @@
             return data;
         }
 
-        public int Transform(Span<byte> data)
+        public unsafe int Transform(Span<byte> data)
         {
-            for (int m = 0; m < data.Length; m++)
+            fixed (byte* dataPtr = data)
             {
-                i = (byte)(i + 1);
-                Si = Sbox[i];
-                j = (byte)(i + Si);
-                Sj = Sbox[j];
+                fixed (byte* sboxPtr = Sbox)
+                {
+                    int len = data.Length;
 
-                data[m] ^= Sbox[(byte)(Si + Sj)];
+                    for (int m = 0; m < len; m++)
+                    {
+                        byte Si = sboxPtr[(byte)(m + 1)];
+                        byte Sj = sboxPtr[(byte)(m + 1 + Si)];
+                        dataPtr[m] ^= sboxPtr[(byte)(Si + Sj)];
+                    }
+                }
             }
+            
             return data.Length;
         }
 

@@ -24,7 +24,7 @@ namespace NCMDump.Benchmark
             _ncmRC4_Native = new NcmRC4Native(key);
 
 
-            _dataSource = new byte[64 * 1024 * 1024]; 
+            _dataSource = new byte[50 * 1024 * 1024]; 
             _random.NextBytes(_dataSource);
         }
 
