@@ -124,21 +124,21 @@
                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                    Appearance="Primary"
-                   Command="{Binding ConvertCommand}"
+                   Command="{Binding StartConvertCommand}"
                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
 
         <ui:Button x:Name="SelectFileButton" Icon="{ui:SymbolIcon AddSquareMultiple16}" Content="Select File" FontSize="12"
                    Width="150" Height="36" Margin="0,0,156,24" Grid.Row="3"
                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                   Command="{Binding AddFileCommand}"
+                   Command="{Binding SelectFileCommand}"
                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
 
         <ui:Button x:Name="SelectFolderButton" Icon="{ui:SymbolIcon FolderAdd16}" Content="Select Folder" FontSize="12"
                    Width="150" Height="36" Margin="0,0,318,24" Grid.Row="3"
                    HorizontalAlignment="Right"  VerticalAlignment="Bottom"
                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
-                   Command="{Binding AddFolderCommand}"
+                   Command="{Binding SelectFolderCommand}"
                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
 
         <ui:Button x:Name="ClearButton" Icon="{ui:SymbolIcon Delete16}" Content="Clear" FontSize="12"
@@ -146,7 +146,7 @@
                    HorizontalAlignment="Left" VerticalAlignment="Bottom"
                    HorizontalContentAlignment="Center" VerticalContentAlignment="Center"
                    Appearance="Danger"
-                   Command="{Binding ClearCommand}"
+                   Command="{Binding ClearListCommand}"
                    IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}" />
     </Grid>
 </ui:FluentWindow>

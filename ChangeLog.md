@@ -1,5 +1,9 @@
 # Change Log
 
+### v2.6.0 2025.10.07
+
+Add experimental native transformer library.(Only on Windows)
+
 ### v2.5.1 2025.04.30
 
 Upgrade WPF.UI Package

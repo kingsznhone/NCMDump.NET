@@ -14,6 +14,11 @@ namespace NCMDump.Core
         private static readonly byte[] coreKey = [0x68, 0x7A, 0x48, 0x52, 0x41, 0x6D, 0x73, 0x6F, 0x35, 0x6B, 0x49, 0x6E, 0x62, 0x61, 0x78, 0x57];
         private static readonly byte[] metaKey = [0x23, 0x31, 0x34, 0x6C, 0x6A, 0x6B, 0x5F, 0x21, 0x5C, 0x5D, 0x26, 0x30, 0x55, 0x3C, 0x27, 0x28];
 
+        private JsonSerializerOptions _jsonOption = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase  
+        };
+
         private bool VerifyHeader(ref MemoryStream ms)
         {
             // Header Should be "CTENFDAM"
@@ -21,7 +26,6 @@ namespace NCMDump.Core
             ms.Read(header);
             long header_num = MemoryMarshal.Read<long>(header);
             return header_num == 0x4d4144464e455443;
-            //return Enumerable.SequenceEqual(header.ToArray(), new byte[] { 0x43, 0x54, 0x45, 0x4E, 0x46, 0x44, 0x41, 0x4D });
         }
 
         private byte[] ReadRC4Key(ref MemoryStream ms)
@@ -89,22 +93,19 @@ namespace NCMDump.Core
                 aes.Key = metaKey;
                 var cleanText = aes.DecryptEcb(buffer, PaddingMode.PKCS7);
                 var MetaJsonString = Encoding.UTF8.GetString(cleanText.AsSpan(6));
-                JsonSerializerOptions option = new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase  // 自动将大驼峰属性名匹配到小驼峰JSON键
-                };
-                MetaInfo metainfo = JsonSerializer.Deserialize<MetaInfo>(MetaJsonString, option)!;
+
+                MetaInfo metainfo = JsonSerializer.Deserialize<MetaInfo>(MetaJsonString, _jsonOption)!;
                 return metainfo;
             }
         }
 
         private async Task<byte[]> ReadAudioData(MemoryStream ms, byte[] Key)
         {
-            using (IRC4_NCM_Stream rc4s = new NcmRC4Stream(ms, Key))
+            using (NcmRC4Stream rc4s = new NcmRC4Stream(ms, Key))
             {
                 byte[] AudioData = new byte[ms.Length - ms.Position];
                 Memory<byte> AudioDataView = new(AudioData);
-                await rc4s.ReadAsync(AudioDataView);
+                await rc4s.ReadExactlyAsync(AudioDataView);
                 return AudioData;
             }
         }

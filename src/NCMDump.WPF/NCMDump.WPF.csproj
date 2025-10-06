@@ -6,10 +6,11 @@
     <Nullable>enable</Nullable>
     <UseWPF>True</UseWPF>
     <ApplicationIcon>NCMDump.ico</ApplicationIcon>
-	<Version>2.5.1</Version>
+	<Version>2.6.0</Version>
 	<Platforms>x64</Platforms>
 	<ApplicationManifest>app.manifest</ApplicationManifest>
 	<LangVersion>preview</LangVersion>
+	<IncludeNativeLibrariesForSelfExtract >true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,12 +20,12 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.4" />
-    <PackageReference Include="WPF-UI" Version="4.0.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" />
+    <PackageReference Include="WPF-UI" Version="4.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\NCMDump.Core\NCMDump.Core.csproj" />
   </ItemGroup>
-
+	
 </Project>

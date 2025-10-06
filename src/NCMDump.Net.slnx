@@ -1,0 +1,22 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+  </Configurations>
+  <Project Path="NCMDump.Benchmark/NCMDump.Benchmark.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="NCMDump.CLI/NCMDump.CLI.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="NCMDump.Core/NCMDump.Core.csproj">
+    <BuildDependency Project="RC4Transformer/RC4Transformer.vcxproj" />
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="NCMDump.Test/NCMDump.Test.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="NCMDump.WPF/NCMDump.WPF.csproj">
+    <Platform Project="x64" />
+  </Project>
+  <Project Path="RC4Transformer/RC4Transformer.vcxproj" Id="948bee0f-044a-46f7-b7fb-402399f3033b" />
+</Solution>

@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using NCMDump.Core;
+﻿using NCMDump.Core;
+using System.Reflection;
 
 namespace NCMDump.CLI
 {

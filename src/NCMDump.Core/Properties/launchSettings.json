@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "NCMDump.Core": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}
