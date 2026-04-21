@@ -129,7 +129,6 @@ jobs:
           -c Release
           -r ${{ matrix.rid }}
           -p:PublishSingleFile=true
-          -p:PublishTrimmed=true
           -p:PublishReadyToRun=true
           --no-self-contained
           -o publish/wpf-out
