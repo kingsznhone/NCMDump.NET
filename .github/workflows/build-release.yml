@@ -83,7 +83,6 @@ jobs:
           -r ${{ matrix.rid }}
           --no-self-contained
           -p:PublishSingleFile=true
-          -p:PublishTrimmed=true
           -p:PublishReadyToRun=true
           -p:GeneratePackageOnBuild=false
           -o publish/out
