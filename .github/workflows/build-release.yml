@@ -35,31 +35,16 @@ jobs:
           fi
 
   build-cli:
-    name: ${{ matrix.rid }} / ${{ matrix.mode }}
+    name: CLI / ${{ matrix.rid }}
     needs: get-version
     strategy:
       fail-fast: false
       matrix:
         include:
-          # Framework-dependent: cross-compilation, all run on ubuntu
           - os: ubuntu-latest
             rid: win-x64
-            mode: framework
-            suffix: ""
           - os: ubuntu-latest
             rid: linux-x64
-            mode: framework
-            suffix: ""
-
-          # AOT: must run on native platform
-          - os: windows-latest
-            rid: win-x64
-            mode: aot
-            suffix: -aot
-          - os: ubuntu-latest
-            rid: linux-x64
-            mode: aot
-            suffix: -aot
 
     runs-on: ${{ matrix.os }}
 
@@ -71,12 +56,7 @@ jobs:
         with:
           dotnet-version: '10'
 
-      - name: Install AOT prerequisites (Linux)
-        if: matrix.mode == 'aot' && runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
-
-      - name: Publish (framework-dependent)
-        if: matrix.mode == 'framework'
+      - name: Publish
         run: >
           dotnet publish src/NCMDump.CLI/NCMDump.CLI.csproj
           -c Release
@@ -84,24 +64,19 @@ jobs:
           --no-self-contained
           -p:PublishSingleFile=true
           -p:PublishReadyToRun=true
+          -p:DebugType=none
+          -p:DebugSymbols=false
           -p:GeneratePackageOnBuild=false
           -o publish/out
 
-      - name: Publish (AOT)
-        if: matrix.mode == 'aot'
-        run: >
-          dotnet publish src/NCMDump.CLI/NCMDump.CLI.csproj
-          -c Release
-          -r ${{ matrix.rid }}
-          -p:PublishAot=true
-          -p:PublishTrimmed=true
-          -p:GeneratePackageOnBuild=false
-          -o publish/out
+      - name: Rename executable (linux)
+        if: matrix.rid == 'linux-x64'
+        run: mv publish/out/NCMDump.CLI publish/out/ncmdump
 
       - name: Upload artifact
         uses: actions/upload-artifact@v7
         with:
-          name: ncmdump-cli-${{ needs.get-version.outputs.version }}-${{ matrix.rid }}${{ matrix.suffix }}
+          name: ncmdump-cli-${{ needs.get-version.outputs.version }}-${{ matrix.rid }}
           path: publish/out/
           if-no-files-found: error
 
@@ -130,6 +105,8 @@ jobs:
           -r ${{ matrix.rid }}
           -p:PublishSingleFile=true
           -p:PublishReadyToRun=true
+          -p:DebugType=none
+          -p:DebugSymbols=false
           --no-self-contained
           -o publish/wpf-out
 
@@ -174,11 +151,7 @@ jobs:
           mkdir -p packaged
           for dir in release-assets/*/; do
             name=$(basename "$dir")
-            if [[ "$name" == *win-x64* ]]; then
-              (cd "$dir" && zip -r "${GITHUB_WORKSPACE}/packaged/${name}.zip" .)
-            else
-              tar -czf "packaged/${name}.tar.gz" -C "$dir" .
-            fi
+            (cd "$dir" && zip -r "${GITHUB_WORKSPACE}/packaged/${name}.zip" .)
           done
           echo "--- Packaged files ---"
           ls -lh packaged/
