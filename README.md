@@ -14,9 +14,7 @@ Keep ID3 tags and cover image.
 
 ## System Requirement
 
- ```Windows 11 10.0.22000.0``` & ```.NET 9 Desktop Runtime``` (Recommended)
-
- ```Windows 10 10.0.19041.0``` & ```.NET 9 Desktop Runtime``` (Minimum)
+ ```Windows 11 10.0.22000.0``` & ```.NET 10 Desktop Runtime``` (Minimum)
 
 Linux with dotnet 9 runtime
 
