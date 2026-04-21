@@ -2,19 +2,20 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net9.0</TargetFramework>
+		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<ApplicationIcon>NCMDump.ico</ApplicationIcon>
-		<ApplicationManifest>app.manifest</ApplicationManifest>
-		<Version>2.6.0</Version>
+		<Version>2.7.0</Version>
 		<Platforms>x64</Platforms>
-
-		<IncludeNativeLibrariesForSelfExtract >true</IncludeNativeLibrariesForSelfExtract>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<Content Include="NCMDump.ico" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="System.CommandLine" Version="3.0.0-preview.3.26207.106" />
 	</ItemGroup>
 
 	<ItemGroup>

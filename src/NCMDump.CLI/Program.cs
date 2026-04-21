@@ -1,84 +1,142 @@
 ﻿using NCMDump.Core;
-using System.Reflection;
+using System.CommandLine;
 
-namespace NCMDump.CLI
+namespace NCMDump.CLI;
+
+internal static class Application
 {
-    public class Application
+    private static readonly NCMDumper Dumper = new();
+
+    internal static async Task<int> Main(string[] args)
     {
-        public static NCMDumper Dumper = new();
-        public static int DirDepth = 0;
-
-        public static void Main(params string[] args)
+        var pathsArgument = new Argument<string[]>("paths")
         {
-            var version = Assembly.GetEntryAssembly()?.GetName().Version;
+            Description = "One or more .ncm files or directories to convert.",
+            Arity = ArgumentArity.ZeroOrMore
+        };
 
-            if (args.Length == 0)
+        var depthOption = new Option<int>("--depth", "-d")
+        {
+            Description = "Maximum directory recursion depth.",
+            DefaultValueFactory = _ => 16
+        };
+        depthOption.Validators.Add(result =>
+        {
+            if (result.GetValueOrDefault<int>() < 1)
+                result.AddError("Depth must be at least 1.");
+        });
+
+        var outputOption = new Option<DirectoryInfo?>("--output", "-o")
+        {
+            Description = "Output directory for converted files. Defaults to the same directory as each source file."
+        };
+
+        var rootCommand = new RootCommand("NCMDump CLI — converts NetEase Cloud Music .ncm files to playable audio.")
+        {
+            pathsArgument,
+            depthOption,
+            outputOption
+        };
+
+        if (OperatingSystem.IsWindows())
+            rootCommand.Description +=
+                "\n\nTip: you can also drag .ncm files or a folder onto ncmdump.exe to start conversion.";
+
+        rootCommand.SetAction(async (parseResult, cancellationToken) =>
+        {
+            string[] paths = parseResult.GetValue(pathsArgument) ?? [];
+            int maxDepth = parseResult.GetValue(depthOption);
+            DirectoryInfo? outputDir = parseResult.GetValue(outputOption);
+
+            if (paths.Length == 0)
             {
-                Console.WriteLine("==============================");
-                Console.WriteLine($"NCMDump CLI - Version {version}");
-                Console.WriteLine("==============================");
-                Console.WriteLine("");
-                if (OperatingSystem.IsWindows())
-                {
-                    Console.WriteLine("./ncmdump.exe <file_or_dir1> [<file_or_dir2> ... <file_or_dirN>]");
-                    Console.WriteLine("Or drag [*.ncm] file or directory on exe to start...");
-                }
-                if (OperatingSystem.IsLinux())
-                {
-                    Console.WriteLine("./ncmdump <file_or_dir1> [<file_or_dir2> ... <file_or_dirN>]");
-                }
-                return;
+                Console.Error.WriteLine(
+                    "No input specified. Use --help for usage information.");
+                return 1;
             }
 
-            try
+            int failures = 0;
+
+            foreach (string path in paths)
             {
-                foreach (string path in args)
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if (Directory.Exists(path))
                 {
-                    if (new DirectoryInfo(path).Exists)
-                    {
-                        WalkThrough(new DirectoryInfo(path));
-                    }
-                    else if (new FileInfo(path).Exists)
-                    {
-                        Console.Write($"Dumping: {new FileInfo(path).FullName} ......");
-                        if (Dumper.Convert(path)) Console.WriteLine("OK");
-                        else Console.WriteLine("Fail");
-                        Console.WriteLine();
-                    }
+                    failures += await WalkThroughAsync(
+                        new DirectoryInfo(path), outputDir, maxDepth, 0, cancellationToken);
+                }
+                else if (File.Exists(path))
+                {
+                    failures += await DumpFileAsync(new FileInfo(path), outputDir, cancellationToken);
+                }
+                else
+                {
+                    Console.Error.WriteLine($"Not found: {path}");
+                    failures++;
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
 
-            Console.Write("Press Enter to Exit...");
-            Console.ReadLine();
-            return;
+            return failures == 0 ? 0 : 1;
+        });
 
-            void WalkThrough(DirectoryInfo dir)
-            {
-                DirDepth++;
-                if (DirDepth > 16)
-                {
-                    DirDepth--;
-                    return;
-                }
-                Console.WriteLine("DIR: " + dir.FullName);
-                foreach (DirectoryInfo d in dir.GetDirectories())
-                {
-                    WalkThrough(d);
-                }
-                foreach (FileInfo f in dir.EnumerateFiles("*.ncm"))
-                {
-                    Console.Write($"Dumping: {f.FullName} ......");
-                    if (Dumper.Convert(f.FullName)) Console.WriteLine("OK");
-                    else Console.WriteLine("...Fail");
-                }
+        return await rootCommand.Parse(args).InvokeAsync();
+    }
 
-                Console.WriteLine();
-                DirDepth--;
-            }
+    /// <summary>Converts a single .ncm file, writing output to <paramref name="outputDir"/> when specified.</summary>
+    private static async Task<int> DumpFileAsync(
+        FileInfo file, DirectoryInfo? outputDir, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        string sourcePath = file.FullName;
+        string effectivePath = sourcePath;
+
+        if (outputDir is not null)
+        {
+            outputDir.Create();
+            string destName = Path.GetFileNameWithoutExtension(file.Name);
+            // Use a temporary copy in the output dir so NCMDumper writes the result there.
+            // NCMDumper derives output path from input path, so we pass a relocated copy path.
+            effectivePath = Path.Combine(outputDir.FullName, file.Name);
+            File.Copy(sourcePath, effectivePath, overwrite: true);
         }
+
+        Console.Write($"Dumping: {sourcePath} ...... ");
+        bool ok = await Dumper.ConvertAsync(effectivePath);
+        Console.WriteLine(ok ? "OK" : "Fail");
+
+        // Remove the temporary .ncm copy from the output dir (the converted file stays).
+        if (outputDir is not null && File.Exists(effectivePath))
+            File.Delete(effectivePath);
+
+        return ok ? 0 : 1;
+    }
+
+    /// <summary>Recursively walks a directory and converts all .ncm files found.</summary>
+    private static async Task<int> WalkThroughAsync(
+        DirectoryInfo dir, DirectoryInfo? outputDir, int maxDepth, int currentDepth,
+        CancellationToken cancellationToken)
+    {
+        if (currentDepth >= maxDepth)
+            return 0;
+
+        Console.WriteLine($"DIR: {dir.FullName}");
+        int failures = 0;
+
+        foreach (DirectoryInfo sub in dir.GetDirectories())
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            failures += await WalkThroughAsync(sub, outputDir, maxDepth, currentDepth + 1, cancellationToken);
+        }
+
+        foreach (FileInfo file in dir.EnumerateFiles("*.ncm"))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            failures += await DumpFileAsync(file, outputDir, cancellationToken);
+        }
+
+        Console.WriteLine();
+        return failures;
     }
 }

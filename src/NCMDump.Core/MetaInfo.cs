@@ -1,23 +1,23 @@
 ﻿namespace NCMDump.Core
 {
-    public class MetaInfo
+    public record MetaInfo
     {
-        public string MusicId { get; set; } = "";
-        public string MusicName { get; set; } = "";
-        public List<List<string>> Artist { get; set; } = new List<List<string>>();
-        public string AlbumId { get; set; } = "";
-        public string Album { get; set; } = "";
-        public string AlbumPicDocId { get; set; } = "";
-        public string AlbumPic { get; set; } = "";
-        public int Bitrate { get; set; } = 0;
-        public string Mp3DocId { get; set; } = "";
-        public int Duration { get; set; } = 0;
-        public string MvId { get; set; } = "";
-        public List<string> Alias { get; set; } = new List<string>();
-        public List<string> TransNames { get; set; } = new List<string>();
-        public string Format { get; set; } = "";
-        public float Fee { get; set; } = 0;
-        public float VolumeDelta { get; set; } = 0;
-        public Dictionary<string, int> Privilege { get; set; } = new Dictionary<string, int>();
+        public string MusicId { get; init; } = "";
+        public string MusicName { get; init; } = "";
+        public List<List<string>> Artist { get; init; } = [];
+        public string AlbumId { get; init; } = "";
+        public string Album { get; init; } = "";
+        public string AlbumPicDocId { get; init; } = "";
+        public string AlbumPic { get; init; } = "";
+        public int Bitrate { get; init; } = 0;
+        public string Mp3DocId { get; init; } = "";
+        public int Duration { get; init; } = 0;
+        public string MvId { get; init; } = "";
+        public List<string> Alias { get; init; } = [];
+        public List<string> TransNames { get; init; } = [];
+        public string Format { get; init; } = "";
+        public float Fee { get; init; } = 0;
+        public float VolumeDelta { get; init; } = 0;
+        public Dictionary<string, int> Privilege { get; init; } = [];
     }
 }

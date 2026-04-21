@@ -1,4 +1,10 @@
 # Change Log
+### v2.7.0 2026.04.21
+Upgrade to .Net 10 
+
+POSIX-compliant CLI
+
+Remove Native transformer library due to performance enhancement by dotnet 10.
 
 ### v2.6.0 2025.10.07
 

@@ -1,0 +1,192 @@
+name: Build and Publish NCMDump.NET
+
+on:
+  workflow_dispatch:
+  release:
+    types:
+      - published
+
+permissions:
+  contents: write
+
+jobs:
+  get-version:
+    name: Extract Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Extract version tag
+        id: version
+        run: |
+          git fetch --tags --force
+          VERSION_TAG=$(git tag --points-at "$GITHUB_SHA" | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$' | head -n 1 || echo "")
+          if [ -n "$VERSION_TAG" ]; then
+            echo "version=$VERSION_TAG" >> $GITHUB_OUTPUT
+            echo "Found version tag: $VERSION_TAG"
+          else
+            SHORT_SHA=$(git rev-parse --short HEAD)
+            echo "version=${SHORT_SHA}" >> $GITHUB_OUTPUT
+            echo "No version tag found, using: ${SHORT_SHA}"
+          fi
+
+  build-cli:
+    name: ${{ matrix.rid }} / ${{ matrix.mode }}
+    needs: get-version
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Framework-dependent: cross-compilation, all run on ubuntu
+          - os: ubuntu-latest
+            rid: win-x64
+            mode: framework
+            suffix: ""
+          - os: ubuntu-latest
+            rid: linux-x64
+            mode: framework
+            suffix: ""
+
+          # AOT: must run on native platform
+          - os: windows-latest
+            rid: win-x64
+            mode: aot
+            suffix: -aot
+          - os: ubuntu-latest
+            rid: linux-x64
+            mode: aot
+            suffix: -aot
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10'
+
+      - name: Install AOT prerequisites (Linux)
+        if: matrix.mode == 'aot' && runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y clang zlib1g-dev
+
+      - name: Publish (framework-dependent)
+        if: matrix.mode == 'framework'
+        run: >
+          dotnet publish src/NCMDump.CLI/NCMDump.CLI.csproj
+          -c Release
+          -r ${{ matrix.rid }}
+          --no-self-contained
+          -p:PublishSingleFile=true
+          -p:PublishTrimmed=true
+          -p:PublishReadyToRun=true
+          -p:GeneratePackageOnBuild=false
+          -o publish/out
+
+      - name: Publish (AOT)
+        if: matrix.mode == 'aot'
+        run: >
+          dotnet publish src/NCMDump.CLI/NCMDump.CLI.csproj
+          -c Release
+          -r ${{ matrix.rid }}
+          -p:PublishAot=true
+          -p:PublishTrimmed=true
+          -p:GeneratePackageOnBuild=false
+          -o publish/out
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ncmdump-cli-${{ needs.get-version.outputs.version }}-${{ matrix.rid }}${{ matrix.suffix }}
+          path: publish/out/
+          if-no-files-found: error
+
+  build-wpf:
+    name: WPF / ${{ matrix.rid }}
+    needs: get-version
+    strategy:
+      fail-fast: false
+      matrix:
+        rid:
+          - win-x64
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10'
+
+      - name: Publish (framework-dependent)
+        run: >
+          dotnet publish src/NCMDump.WPF/NCMDump.WPF.csproj
+          -c Release
+          -r ${{ matrix.rid }}
+          -p:PublishSingleFile=true
+          -p:PublishTrimmed=true
+          -p:PublishReadyToRun=true
+          --no-self-contained
+          -o publish/wpf-out
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ncmdump-wpf-${{ needs.get-version.outputs.version }}-${{ matrix.rid }}
+          path: publish/wpf-out/
+          if-no-files-found: error
+
+  verify-builds:
+    name: Verify All Builds Passed
+    if: github.event_name == 'workflow_dispatch'
+    needs:
+      - get-version
+      - build-cli
+      - build-wpf
+    runs-on: ubuntu-latest
+    steps:
+      - name: All builds succeeded
+        run: |
+          echo "✅ All matrix builds passed for version: ${{ needs.get-version.outputs.version }}"
+          echo "Artifacts are NOT uploaded to any release (manual trigger)."
+
+  publish-release:
+    name: Upload to Release
+    if: github.event_name == 'release'
+    needs:
+      - get-version
+      - build-cli
+      - build-wpf
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: release-assets
+          merge-multiple: false
+
+      - name: Package artifacts
+        run: |
+          mkdir -p packaged
+          for dir in release-assets/*/; do
+            name=$(basename "$dir")
+            if [[ "$name" == *win-x64* ]]; then
+              (cd "$dir" && zip -r "${GITHUB_WORKSPACE}/packaged/${name}.zip" .)
+            else
+              tar -czf "packaged/${name}.tar.gz" -C "$dir" .
+            fi
+          done
+          echo "--- Packaged files ---"
+          ls -lh packaged/
+
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: packaged/*
+          token: ${{ secrets.GITHUB_TOKEN }}

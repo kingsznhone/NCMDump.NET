@@ -19,7 +19,7 @@ namespace NCMDump.Core
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase  
         };
 
-        private bool VerifyHeader(ref MemoryStream ms)
+        private bool VerifyHeader(MemoryStream ms)
         {
             // Header Should be "CTENFDAM"
             Span<byte> header = stackalloc byte[8];
@@ -28,10 +28,10 @@ namespace NCMDump.Core
             return header_num == 0x4d4144464e455443;
         }
 
-        private byte[] ReadRC4Key(ref MemoryStream ms)
+        private byte[] ReadRC4Key(MemoryStream ms)
         {
             // read keybox length
-            uint KeyboxLength = ReadUint32(ref ms);
+            uint KeyboxLength = ReadUint32(ms);
 
             //read raw keybox data
             Span<byte> buffer = stackalloc byte[(int)KeyboxLength];
@@ -62,10 +62,10 @@ namespace NCMDump.Core
             }
         }
 
-        private MetaInfo ReadMeta(ref MemoryStream ms)
+        private MetaInfo ReadMeta(MemoryStream ms)
         {
             // read meta length
-            var MetaLength = ReadUint32(ref ms);
+            var MetaLength = ReadUint32(ms);
             Span<byte> buffer = new byte[(int)MetaLength];
             ref byte ref_b = ref MemoryMarshal.GetReference(buffer);
             ms.Read(buffer);
@@ -139,22 +139,19 @@ namespace NCMDump.Core
             tagfile.Save();
         }
 
+        private static readonly HttpClient _httpClient = new();
+
         private async Task<byte[]?> FetchUrl(Uri uri)
         {
-            HttpClient client = new();
             try
             {
-                var response = await client.GetAsync(uri);
+                var response = await _httpClient.GetAsync(uri);
                 Console.WriteLine(response.StatusCode);
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    using (var memStream = new MemoryStream())
-                    {
-                        response.Content.ReadAsStream().CopyTo(memStream);
-                        memStream.Position = 0;
-                        Console.WriteLine("album picture Load OK : remote returned {0}", response.StatusCode);
-                        return memStream.ToArray();
-                    }
+                    var data = await response.Content.ReadAsByteArrayAsync();
+                    Console.WriteLine("album picture Load OK : remote returned {0}", response.StatusCode);
+                    return data;
                 }
                 else
                 {
@@ -170,7 +167,7 @@ namespace NCMDump.Core
             }
         }
 
-        private uint ReadUint32(ref MemoryStream ms)
+        private uint ReadUint32(MemoryStream ms)
         {
             Span<byte> buffer = stackalloc byte[4];
             ms.Read(buffer);
@@ -191,10 +188,10 @@ namespace NCMDump.Core
             }
 
             //Read all bytes to ram.
-            MemoryStream ms = new(await System.IO.File.ReadAllBytesAsync(path));
+            await using MemoryStream ms = new(await System.IO.File.ReadAllBytesAsync(path));
 
             //Verify Header
-            if (!VerifyHeader(ref ms))
+            if (!VerifyHeader(ms))
             {
                 Console.WriteLine($"{path} is not a NCM File");
                 return false;
@@ -204,19 +201,19 @@ namespace NCMDump.Core
             ms.Seek(2, SeekOrigin.Current);
 
             //Make Keybox
-            byte[] RC4Key = ReadRC4Key(ref ms);
+            byte[] RC4Key = ReadRC4Key(ms);
 
             //Read Meta Info
-            MetaInfo metainfo = ReadMeta(ref ms);
+            MetaInfo metainfo = ReadMeta(ms);
 
             //CRC32 Check
-            uint crc32 = ReadUint32(ref ms);
+            uint crc32 = ReadUint32(ms);
 
             // skip 5 character,
             ms.Seek(5, SeekOrigin.Current);
 
             // read image length
-            var ImageLength = ReadUint32(ref ms);
+            var ImageLength = ReadUint32(ms);
             byte[]? ImageData;
             if (ImageLength != 0)
             {
@@ -240,7 +237,6 @@ namespace NCMDump.Core
 
             //Add tag and cover
             await Task.Run(() => AddTag($"{OutputPath}.{format}", ImageData, metainfo));
-            await ms.DisposeAsync();
             return true;
         }
     }

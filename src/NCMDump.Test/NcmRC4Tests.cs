@@ -97,20 +97,5 @@ namespace NCMDump.Test
             CollectionAssert.AreEqual(data1, data2, "Same key and data should produce identical results");
         }
 
-        [TestMethod]
-        public void Transform_TestNative()
-        {
-            byte[] key = [0x01, 0x02, 0x03, 0x04];
-            byte[] data1 = [0x48, 0x65, 0x6C, 0x6C, 0x6F];
-            byte[] data2 = [0x48, 0x65, 0x6C, 0x6C, 0x6F];
-            var rc4_1 = new NcmRC4(key);
-            var rc4_2 = new NcmRC4Native(key);
-
-            rc4_1.Transform(data1);
-            rc4_2.Transform(data2);
-
-            // Assert
-            CollectionAssert.AreEqual(data1, data2, "Same key and data should produce identical results");
-        }
     }
 }

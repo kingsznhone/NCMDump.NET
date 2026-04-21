@@ -8,16 +8,8 @@
         public NcmRC4Stream(Stream innerStream, byte[] key)
         {
             _innerStream = innerStream;
-            if (OperatingSystem.IsOSPlatform("Windows"))
-            {
-                _rc4 = new NcmRC4Native(key);
-                return;
-            }
-            else
-            {
-                _rc4 = new NcmRC4(key);
-                return;
-            }
+            _rc4 = new NcmRC4(key);
+            return;
         }
 
         public override bool CanRead => _innerStream.CanRead;
@@ -60,7 +52,7 @@
 
             if (bytesRead > 0)
             {
-                await Task.Run(() => _rc4.Transform(buffer[..bytesRead]), cancellationToken).ConfigureAwait(false);
+                _rc4.Transform(buffer.Span[..bytesRead]);
             }
             return bytesRead;
         }
