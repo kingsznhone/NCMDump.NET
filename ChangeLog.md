@@ -1,5 +1,16 @@
 # Change Log
+### v2.8.0 2026.04.24
+
+`ConvertAsync()` now supports a custom output directory instead of deriving the output path from the input path.
+
+Enhanced input validation & error handling: 4KB stackalloc safety limit, incomplete data detection, tag-write exception protection.
+
+Full CancellationToken support with 5-second network request timeout.
+
+Code cleanup: removed redundant `IRC4Stream` interface, extracted `NcmFileScanner` for WPF, simplified `using` declarations.
+
 ### v2.7.0 2026.04.21
+
 Upgrade to .Net 10 
 
 POSIX-compliant CLI
