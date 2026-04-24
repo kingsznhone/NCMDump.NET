@@ -14,13 +14,17 @@ Keep ID3 tags and cover image.
 
 ## System Requirement
 
- ```Windows 11 10.0.22000.0``` & ```.NET 10 Desktop Runtime``` (Minimum)
+```Windows 11 10.0.22000.0``` & ```.NET 10 Desktop Runtime``` (Minimum)
 
-Linux with dotnet 9 runtime
+Linux with .NET 10 runtime
 
 ## Usage
 
 ### CLI
+
+```bash
+ncmdump <file_or_directory> [file_or_directory]... [-o <output_dir>] [-d <depth>]
+```
 
 Drag .ncm file or directory on exe
 
@@ -30,37 +34,25 @@ Don't ask, Just use.
 
 ## API
 
-### public bool Convert(string path)
+### ConvertAsync
 
-Convert NCM file into MP3/FLAC format in synchronous.
+```csharp
+Task<bool> ConvertAsync(string path, string? outputDir = null, CancellationToken cancellationToken = default)
+```
 
-#### Parameters
-
-```path``` String
-
-File Path to a NCM file.
-
-#### Return
-
-```bool``` True if convert success
-
-<br/>
-
-### public async Task\<bool\> ConvertAsync(string path)
-
-Convert NCM file into MP3/FLAC format in asynchronous.
+Convert NCM file into MP3/FLAC format asynchronously.
 
 #### Parameters
 
-```path``` String
-
-File Path to a NCM file.
+- `path` - File path to a .ncm file.
+- `outputDir` - Optional output directory. When null, output is placed next to the source file. (since v2.7.0)
+- `cancellationToken` - Cancellation token.
 
 #### Return
 
-```bool``` True if convert success
+`true` if conversion succeeded.
 
-## Refrence
+## Reference
 <https://github.com/mono/taglib-sharp>
 
 <https://github.com/lepoco/wpfui>

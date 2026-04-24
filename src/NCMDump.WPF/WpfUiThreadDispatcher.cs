@@ -8,8 +8,10 @@ namespace NCMDump.WPF
     {
         private readonly Dispatcher _dispatcher;
 
-        public WpfUiThreadDispatcher(Dispatcher dispatcher) =>
+        public WpfUiThreadDispatcher(Dispatcher dispatcher)
+        {
             _dispatcher = dispatcher ?? throw new ArgumentNullException(nameof(dispatcher));
+        }
 
         public Task InvokeAsync(Action action) =>
             _dispatcher.InvokeAsync(action).Task;

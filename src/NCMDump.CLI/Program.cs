@@ -44,6 +44,13 @@ internal static class Application
 
         rootCommand.SetAction(async (parseResult, cancellationToken) =>
         {
+            // Set up Ctrl+C graceful exit message
+            Console.CancelKeyPress += (sender, eventArgs) =>
+            {
+                eventArgs.Cancel = true;
+                Console.Error.WriteLine("\nReceived cancellation signal. Shutting down gracefully...");
+            };
+
             string[] paths = parseResult.GetValue(pathsArgument) ?? [];
             int maxDepth = parseResult.GetValue(depthOption);
             DirectoryInfo? outputDir = parseResult.GetValue(outputOption);
@@ -90,25 +97,13 @@ internal static class Application
         cancellationToken.ThrowIfCancellationRequested();
 
         string sourcePath = file.FullName;
-        string effectivePath = sourcePath;
+        string? outputDirPath = outputDir?.FullName;
 
-        if (outputDir is not null)
-        {
-            outputDir.Create();
-            string destName = Path.GetFileNameWithoutExtension(file.Name);
-            // Use a temporary copy in the output dir so NCMDumper writes the result there.
-            // NCMDumper derives output path from input path, so we pass a relocated copy path.
-            effectivePath = Path.Combine(outputDir.FullName, file.Name);
-            File.Copy(sourcePath, effectivePath, overwrite: true);
-        }
+        outputDir?.Create();
 
         Console.Write($"Dumping: {sourcePath} ...... ");
-        bool ok = await Dumper.ConvertAsync(effectivePath);
+        bool ok = await Dumper.ConvertAsync(sourcePath, outputDirPath, cancellationToken);
         Console.WriteLine(ok ? "OK" : "Fail");
-
-        // Remove the temporary .ncm copy from the output dir (the converted file stays).
-        if (outputDir is not null && File.Exists(effectivePath))
-            File.Delete(effectivePath);
 
         return ok ? 0 : 1;
     }
@@ -124,7 +119,7 @@ internal static class Application
         Console.WriteLine($"DIR: {dir.FullName}");
         int failures = 0;
 
-        foreach (DirectoryInfo sub in dir.GetDirectories())
+        foreach (DirectoryInfo sub in dir.EnumerateDirectories())
         {
             cancellationToken.ThrowIfCancellationRequested();
             failures += await WalkThroughAsync(sub, outputDir, maxDepth, currentDepth + 1, cancellationToken);

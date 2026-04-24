@@ -7,7 +7,7 @@ namespace NCMDump.WPF
 {
     public partial class MainWindow : FluentWindow
     {
-        private MainWindowViewModel VM;
+        private readonly MainWindowViewModel VM;
 
         public MainWindow(MainWindowViewModel _vm)
         {
@@ -20,7 +20,8 @@ namespace NCMDump.WPF
 
         private void DataGrid_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            DataGrid grid = sender as DataGrid;
+            DataGrid? grid = sender as DataGrid;
+            ArgumentNullException.ThrowIfNull(grid);
             var workingWidth = grid.ActualWidth - SystemParameters.VerticalScrollBarWidth;
             grid.Columns[0].Width = workingWidth - 130;
             grid.Columns[1].Width = 120;

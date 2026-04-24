@@ -11,7 +11,7 @@ namespace NCMDump.Test
             // Arrange
             byte[] key = [0x01, 0x02, 0x03, 0x04];
             var rc4 = new NcmRC4(key);
-            Span<byte> data = stackalloc byte[] { 0x48, 0x65, 0x6C, 0x6C, 0x6F };
+            Span<byte> data = [0x48, 0x65, 0x6C, 0x6C, 0x6F];
             byte originalFirstByte = data[0];
 
             // Act
@@ -49,7 +49,7 @@ namespace NCMDump.Test
             // Arrange
             byte[] key = [0x01, 0x02, 0x03, 0x04];
             var rc4 = new NcmRC4(key);
-            Span<byte> emptyData = Span<byte>.Empty;
+            Span<byte> emptyData = [];
 
             // Act
             int result = rc4.Transform(emptyData);

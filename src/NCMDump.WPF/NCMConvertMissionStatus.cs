@@ -2,19 +2,23 @@
 
 namespace NCMDump.WPF
 {
+    /// <summary>
+    /// Defines constants for NCM convert status values used in UI bindings.
+    /// </summary>
+    public static class ConvertStatus
+    {
+        public const string Await = "Await";
+        public const string Success = "Success";
+        public const string Failed = "Failed";
+    }
+
     public partial class NCMConvertMissionStatus : ObservableObject
     {
-        public string FilePath
-        {
-            get => field;
-            set => SetProperty(ref field, value);
-        }
+        [ObservableProperty]
+        public partial string FilePath { get; set; }
 
-        public string FileStatus
-        {
-            get => field;
-            set => SetProperty(ref field, value);
-        }
+        [ObservableProperty]
+        public partial string FileStatus { get; set; }
 
         public NCMConvertMissionStatus(string path, string status)
         {

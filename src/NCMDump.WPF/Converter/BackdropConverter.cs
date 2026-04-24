@@ -9,53 +9,28 @@ namespace NCMDump.WPF.Converter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is WindowBackdropType.Auto)
+            return value switch
             {
-                return "Auto";
-            }
-            if (value is WindowBackdropType.Mica)
-            {
-                return "Mica";
-            }
-            if (value is WindowBackdropType.Acrylic)
-            {
-                return "Acrylic";
-            }
-            if (value is WindowBackdropType.None)
-            {
-                return "None";
-            }
-            if (value is WindowBackdropType.Tabbed)
-            {
-                return "Tabbed";
-            }
-
-            return string.Empty;
+                WindowBackdropType.Auto => "Auto",
+                WindowBackdropType.Mica => "Mica",
+                WindowBackdropType.Acrylic => "Acrylic",
+                WindowBackdropType.None => "None",
+                WindowBackdropType.Tabbed => "Tabbed",
+                _ => string.Empty
+            };
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is "Auto")
+            return value switch
             {
-                return WindowBackdropType.Auto;
-            }
-            if (value is "Mica")
-            {
-                return WindowBackdropType.Mica;
-            }
-            if (value is "Acrylic")
-            {
-                return WindowBackdropType.Acrylic;
-            }
-            if (value is "None")
-            {
-                return WindowBackdropType.None;
-            }
-            if (value is "Tabbed")
-            {
-                return WindowBackdropType.Tabbed;
-            }
-            return null;
+                "Auto" => WindowBackdropType.Auto,
+                "Mica" => WindowBackdropType.Mica,
+                "Acrylic" => WindowBackdropType.Acrylic,
+                "None" => WindowBackdropType.None,
+                "Tabbed" => WindowBackdropType.Tabbed,
+                _ => WindowBackdropType.Auto
+            };
         }
     }
 }

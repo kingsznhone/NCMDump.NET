@@ -1,20 +1,19 @@
 ﻿namespace NCMDump.Core
 {
-    public class NcmRC4Stream : Stream, IRC4Stream
+    public sealed class NcmRC4Stream : Stream
     {
         private readonly Stream _innerStream;
-        private readonly IRC4Transformer _rc4;
+        private readonly NcmRC4 _rc4;
 
         public NcmRC4Stream(Stream innerStream, byte[] key)
         {
             _innerStream = innerStream;
             _rc4 = new NcmRC4(key);
-            return;
         }
 
         public override bool CanRead => _innerStream.CanRead;
         public override bool CanSeek => _innerStream.CanSeek;
-        public override bool CanWrite => _innerStream.CanWrite;
+        public override bool CanWrite => false;
         public override long Length => _innerStream.Length;
         public override bool CanTimeout => _innerStream.CanTimeout;
 
@@ -71,9 +70,6 @@
             => throw new NotSupportedException();
 
         public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
-            => throw new NotSupportedException();
-
-        public override void CopyTo(Stream destination, int bufferSize)
             => throw new NotSupportedException();
     }
 }

@@ -4,9 +4,9 @@ using Microsoft.Win32;
 using NCMDump.Core;
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Wpf.Ui.Controls;
@@ -18,9 +18,7 @@ namespace NCMDump.WPF
         private readonly NCMDumper _dumper;
         private readonly IUiThreadDispatcher _dispatcher;
 
-        private bool ClearListCanExecute() => NCMCollection.Count > 0 && !IsBusy;
-
-        private bool StartConvertCanExecute() => NCMCollection.Count > 0 && !IsBusy;
+        private bool CanExecuteWhenNotBusy() => NCMCollection.Count > 0 && !IsBusy;
 
         [ObservableProperty]
         public partial bool IsBusy { get; set; }
@@ -83,78 +81,66 @@ namespace NCMDump.WPF
 
         public void OnDrop(params string[] paths)
         {
-            foreach (string path in paths)
-            {
-                if (new DirectoryInfo(path).Exists)
-                {
-                    WalkThrough(new DirectoryInfo(path));
-                }
-                else if (new FileInfo(path).Exists)
-                {
-                    if (path.EndsWith(@".ncm") && !NCMCollection.Any(x => x.FilePath == path))
-                        NCMCollection.Add(new NCMConvertMissionStatus(path, "Await"));
-                }
-            }
+            NcmFileScanner.ScanPaths(paths, NCMCollection);
         }
 
-        private void WalkThrough(DirectoryInfo dir)
-        {
-            foreach (DirectoryInfo d in dir.GetDirectories())
-            {
-                WalkThrough(d);
-            }
-            foreach (FileInfo f in dir.EnumerateFiles())
-            {
-                if (f.FullName.EndsWith(@".ncm") && !NCMCollection.Any(x => x.FilePath == f.FullName))
-                    NCMCollection.Add(new NCMConvertMissionStatus(f.FullName, "Await"));
-            }
-        }
-
-        [RelayCommand(CanExecute = nameof(StartConvertCanExecute))]
-        private async Task StartConvert()
+        [RelayCommand(CanExecute = nameof(CanExecuteWhenNotBusy))]
+        private async Task StartConvert(CancellationToken token)
         {
             IsBusy = true;
-            await Parallel.ForAsync(0, NCMCollection.Count, async (i, state) =>
+            try
             {
-                if (NCMCollection[i].FileStatus != "Success")
+                // Snapshot items to avoid ObservableCollection thread safety issues
+                var items = NCMCollection.Where(x => x.FileStatus != ConvertStatus.Success).ToArray();
+
+                var options = new ParallelOptions
                 {
+                    CancellationToken = token,
+                    MaxDegreeOfParallelism = Environment.ProcessorCount * 2
+                };
+
+                await Parallel.ForAsync(0, items.Length, options, async (i, state) =>
+                {
+                    var item = items[i];
                     try
                     {
-                        if (await _dumper.ConvertAsync(NCMCollection[i].FilePath))
+                        if (await _dumper.ConvertAsync(item.FilePath, cancellationToken: token))
                         {
-                            await _dispatcher.InvokeAsync(() => NCMCollection[i].FileStatus = "Success");
+                            await _dispatcher.InvokeAsync(() => item.FileStatus = ConvertStatus.Success);
                             if (WillDeleteNCM)
                             {
                                 try
                                 {
-                                    File.Delete(NCMCollection[i].FilePath);
+                                    File.Delete(item.FilePath);
                                 }
                                 catch (Exception ex)
                                 {
-                                    Debug.WriteLine(ex.ToString());
+                                    System.Diagnostics.Debug.WriteLine($"Delete error: {item.FilePath} - {ex.Message}");
                                 }
                             }
                         }
                         else
                         {
-                            await _dispatcher.InvokeAsync(() => NCMCollection[i].FileStatus = "Failed");
+                            await _dispatcher.InvokeAsync(() => item.FileStatus = ConvertStatus.Failed);
                         }
                     }
                     catch (Exception ex)
                     {
-                        await _dispatcher.InvokeAsync(() => NCMCollection[i].FileStatus = "Failed");
+                        System.Diagnostics.Debug.WriteLine($"Convert error: {item.FilePath} - {ex}");
+                        await _dispatcher.InvokeAsync(() => item.FileStatus = ConvertStatus.Failed);
                     }
-                }
-            });
-            GC.Collect(GC.MaxGeneration, GCCollectionMode.Aggressive);
-            GC.WaitForPendingFinalizers();
-            IsBusy = false;
+                });
+            }
+            finally
+            {
+                IsBusy = false;
+            }
         }
 
         [RelayCommand]
         private void SelectFolder()
         {
-            OpenFolderDialog ofp = new OpenFolderDialog
+            OpenFolderDialog ofp = new()
             {
                 Multiselect = true,
             };
@@ -168,7 +154,7 @@ namespace NCMDump.WPF
         [RelayCommand]
         private void SelectFile()
         {
-            OpenFileDialog ofp = new OpenFileDialog
+            OpenFileDialog ofp = new()
             {
                 Multiselect = true,
                 Filter = "NCM File(*.ncm)|*.ncm"
@@ -179,7 +165,7 @@ namespace NCMDump.WPF
             }
         }
 
-        [RelayCommand(CanExecute = nameof(ClearListCanExecute))]
+        [RelayCommand(CanExecute = nameof(CanExecuteWhenNotBusy))]
         private void ClearList() => NCMCollection.Clear();
     }
 }

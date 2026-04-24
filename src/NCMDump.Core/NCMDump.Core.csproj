@@ -5,17 +5,16 @@
 		<TargetFrameworks>net10.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<VersionPrefix>2.7.0</VersionPrefix>
+		<VersionPrefix>2.8.0</VersionPrefix>
 		<Platforms>x64</Platforms>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0|x64'">
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0|x64'">
 		<DebugType>embedded</DebugType>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0|x64'">
-		<DebugType>embedded</DebugType>
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0|x64'">
 	</PropertyGroup>
 
 	<ItemGroup>
