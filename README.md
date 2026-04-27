@@ -1,5 +1,12 @@
 # NCMDump.NET
 
+[![GitHub Stars](https://img.shields.io/github/stars/kingsznhone/NCMDump.NET?style=flat-square)](https://github.com/kingsznhone/NCMDump.NET/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/kingsznhone/NCMDump.NET?style=flat-square)](https://github.com/kingsznhone/NCMDump.NET/network/members)
+[![GitHub Issues](https://img.shields.io/github/issues/kingsznhone/NCMDump.NET?style=flat-square)](https://github.com/kingsznhone/NCMDump.NET/issues)
+[![GitHub License](https://img.shields.io/github/license/kingsznhone/NCMDump.NET?style=flat-square)](https://github.com/kingsznhone/NCMDump.NET/blob/master/LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/kingsznhone/NCMDump.NET?style=flat-square)](https://github.com/kingsznhone/NCMDump.NET/releases/latest)
+[![.NET](https://img.shields.io/badge/.NET-10-512BD4?style=flat-square&logo=dotnet)](https://dotnet.microsoft.com/)
+
 Decipher .ncm file to mp3 || flac
 
 ## Feature
