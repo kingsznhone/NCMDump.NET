@@ -22,7 +22,10 @@ namespace NCMDump.Core
             Span<byte> header = stackalloc byte[8];
             int bytesRead = ms.Read(header);
             if (bytesRead < 8)
+            {
                 return false;
+            }
+
             return header.SequenceEqual("CTENFDAM"u8);
         }
 
@@ -32,14 +35,18 @@ namespace NCMDump.Core
             uint keyboxLength = ReadUint32(ms);
 
             if (keyboxLength > MaxStackallocSize)
+            {
                 throw new InvalidDataException($"Keybox data too large: {keyboxLength} bytes (max {MaxStackallocSize}).");
+            }
 
             Span<byte> buffer = stackalloc byte[(int)keyboxLength];
 
             ref byte refBuffer = ref MemoryMarshal.GetReference(buffer);
             int bytesRead = ms.Read(buffer);
             if (bytesRead < (int)keyboxLength)
+            {
                 throw new InvalidDataException("Incomplete keybox data in NCM file.");
+            }
 
             // SIMD XOR 0x64
             Vector256<byte> xor = Vector256.Create((byte)0x64);
@@ -71,7 +78,9 @@ namespace NCMDump.Core
             ref byte refBuffer = ref MemoryMarshal.GetReference(buffer);
             int bytesRead = ms.Read(buffer);
             if (bytesRead < (int)metaLength)
+            {
                 throw new InvalidDataException("Incomplete metadata in NCM file.");
+            }
 
             // SIMD XOR 0x63
             Vector256<byte> xor = Vector256.Create((byte)0x63);
@@ -183,7 +192,10 @@ namespace NCMDump.Core
             Span<byte> buffer = stackalloc byte[4];
             int bytesRead = ms.Read(buffer);
             if (bytesRead < 4)
+            {
                 throw new InvalidDataException("Insufficient data to read uint32.");
+            }
+
             return MemoryMarshal.Read<uint>(buffer);
         }
 
@@ -241,7 +253,9 @@ namespace NCMDump.Core
                 imageData = new byte[imageLength];
                 int bytesRead = ms.Read(imageData, 0, imageData.Length);
                 if (bytesRead < (int)imageLength)
+                {
                     throw new InvalidDataException("Incomplete image data in NCM file.");
+                }
             }
             else
             {

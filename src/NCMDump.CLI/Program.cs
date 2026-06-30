@@ -23,7 +23,9 @@ internal static class Application
         depthOption.Validators.Add(result =>
         {
             if (result.GetValueOrDefault<int>() < 1)
+            {
                 result.AddError("Depth must be at least 1.");
+            }
         });
 
         var outputOption = new Option<DirectoryInfo?>("--output", "-o")
@@ -39,8 +41,10 @@ internal static class Application
         };
 
         if (OperatingSystem.IsWindows())
+        {
             rootCommand.Description +=
                 "\n\nTip: you can also drag .ncm files or a folder onto ncmdump.exe to start conversion.";
+        }
 
         rootCommand.SetAction(async (parseResult, cancellationToken) =>
         {
@@ -114,7 +118,9 @@ internal static class Application
         CancellationToken cancellationToken)
     {
         if (currentDepth >= maxDepth)
+        {
             return 0;
+        }
 
         Console.WriteLine($"DIR: {dir.FullName}");
         int failures = 0;

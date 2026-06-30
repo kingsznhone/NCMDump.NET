@@ -25,7 +25,9 @@ namespace NCMDump.WPF
                 else if (File.Exists(path))
                 {
                     if (path.EndsWith(".ncm", StringComparison.OrdinalIgnoreCase) && knownPaths.Add(path))
+                    {
                         collection.Add(new NCMConvertMissionStatus(path, ConvertStatus.Await));
+                    }
                 }
             }
         }
@@ -36,7 +38,9 @@ namespace NCMDump.WPF
         private static void WalkDirectory(DirectoryInfo dir, ObservableCollection<NCMConvertMissionStatus> collection, HashSet<string> knownPaths, int maxDepth, int currentDepth)
         {
             if (currentDepth >= maxDepth)
+            {
                 return;
+            }
 
             foreach (DirectoryInfo sub in dir.EnumerateDirectories())
             {
@@ -46,7 +50,9 @@ namespace NCMDump.WPF
             foreach (FileInfo file in dir.EnumerateFiles())
             {
                 if (file.FullName.EndsWith(".ncm", StringComparison.OrdinalIgnoreCase) && knownPaths.Add(file.FullName))
+                {
                     collection.Add(new NCMConvertMissionStatus(file.FullName, ConvertStatus.Await));
+                }
             }
         }
     }

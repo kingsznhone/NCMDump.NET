@@ -1,6 +1,6 @@
 ﻿namespace NCMDump.Core
 {
-    public sealed class NcmRC4: IRC4Transformer
+    public sealed class NcmRC4 : IRC4Transformer
     {
         private readonly byte[] Sbox;
 
@@ -36,7 +36,7 @@
 
                 for (int m = 0; m < len; m++)
                 {
-                    byte Si = sboxPtr[(m + 1)&0xFF];
+                    byte Si = sboxPtr[(m + 1) & 0xFF];
                     byte Sj = sboxPtr[(m + 1 + Si) & 0xFF];
                     data[m] ^= sboxPtr[(Si + Sj) & 0xFF];
                 }

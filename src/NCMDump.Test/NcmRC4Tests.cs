@@ -96,6 +96,5 @@ namespace NCMDump.Test
             // Assert
             CollectionAssert.AreEqual(data1, data2, "Same key and data should produce identical results");
         }
-
     }
 }

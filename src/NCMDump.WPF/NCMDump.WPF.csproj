@@ -6,8 +6,9 @@
     <Nullable>enable</Nullable>
     <UseWPF>True</UseWPF>
     <ApplicationIcon>NCMDump.ico</ApplicationIcon>
-	<Version>2.8.0</Version>
+	<Version>2.8.1</Version>
 	<Platforms>x64</Platforms>
+	<SupportedOSPlatformVersion>10.0.22000.0</SupportedOSPlatformVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,8 +18,8 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.6" />
-    <PackageReference Include="WPF-UI" Version="4.2.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
+    <PackageReference Include="WPF-UI" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
