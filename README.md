@@ -9,6 +9,7 @@
 
 Decipher .ncm file to mp3 || flac
 
+<img src="./README/Demo2.3.png" alt="demo" width="400">
 ## Feature
 
 Highly Optimized Corelib.
