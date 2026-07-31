@@ -1,4 +1,9 @@
 # Change Log
+### v2.8.1 2026.08.01
+
+Update Deps
+
+
 ### v2.8.0 2026.04.24
 
 `ConvertAsync()` now supports a custom output directory instead of deriving the output path from the input path.
