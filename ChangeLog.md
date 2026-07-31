@@ -1,8 +1,11 @@
 # Change Log
-### v2.8.1 2026.08.01
+### v2.8.2 2026.08.01
 
-Update Deps
+Update deps
 
+### v2.8.1 2026.07.01
+
+Update deps
 
 ### v2.8.0 2026.04.24
 
