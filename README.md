@@ -60,6 +60,16 @@ Convert NCM file into MP3/FLAC format asynchronously.
 
 `true` if conversion succeeded.
 
+## Benchmarks
+
+A BenchmarkDotNet project that reports decrypt-stream throughput for .NET 10 and .NET 11 lives in `src/NCMDump.Benchmarks`. It is not part of `dotnet test`.
+
+```bash
+dotnet run -c Release --project src/NCMDump.Benchmarks -f net10.0 -p:Platform=x64
+```
+
+Each run produces separate `.NET 10.0` and `.NET 11.0` jobs. Reports are written to `BenchmarkDotNet.Artifacts/`.
+
 ## Reference
 <https://github.com/mono/taglib-sharp>
 

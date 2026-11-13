@@ -2,6 +2,9 @@
   <Configurations>
     <Platform Name="x64" />
   </Configurations>
+  <Project Path="NCMDump.Benchmarks/NCMDump.Benchmarks.csproj">
+    <Platform Project="x64" />
+  </Project>
   <Project Path="NCMDump.CLI/NCMDump.CLI.csproj">
     <Platform Project="x64" />
   </Project>
